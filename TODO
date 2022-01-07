@@ -1,0 +1,16 @@
+- Display the mouse pointer's XY coordinates in the canvas at the bottom right. Currently, if you idle the mouse long enough, these values will display at the cursor.
+- Adjust tool table to accept plasma tools and all of their parameters
+- Add lead-in paths (look at https://github.com/joco-nz/dxf2gcode-plasma/tree/plasma-leadin)
+- move Qt files into the gui subdirectory for better separation of concerns.
+- bug fix: clicking Generate Paths before opening a dxf causes a crash
+- Open should by default only show project files. Import should by default show drawings (dxf, svg)
+- Draw arrows on each tool path showing cut direction
+- Add SVG support
+- Change local config storage location from .config/dxf2gcode to .config/vsplasma
+- Run PEP8 checker against code
+- Draw grid on the canvas
+- Add support for double click origin setting
+- Generate offset toolpaths, not just G41 and G42
+- Move the Options->Rotate All feature into the Entities Tab as a feature that works when the rotate value is double clicked. Then remove the Options->Rotate All button. Ideally the rotation could be applied to individual shapes or the entire entity.
+- Same change for Options->Scale All
+- Add option to right-click Entity -> Duplicate Entity

@@ -1,0 +1,4 @@
+PyQt5
+PyOpenGL
+configobj
+pyqt5-tools
