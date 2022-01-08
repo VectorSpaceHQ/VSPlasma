@@ -31,7 +31,6 @@ from core.point import Point
 from core.linegeo import LineGeo
 from .classes import PointsClass
 
-import globals.constants as c
 from PyQt5 import QtCore
 
 logger = logging.getLogger("DXFImport.GeoentLine")

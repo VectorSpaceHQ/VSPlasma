@@ -34,7 +34,6 @@ Subclass is done in order to:
           enable and set export order of the shapes
 """
 
-import globals.constants as c
 from PyQt5.QtWidgets import QTreeView
 from PyQt5.QtGui import QStandardItemModel
 from PyQt5 import QtCore

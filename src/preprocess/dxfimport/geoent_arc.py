@@ -32,7 +32,6 @@ from core.point import Point
 from .classes import PointsClass
 from core.arcgeo import ArcGeo
 
-import globals.constants as c
 from PyQt5 import QtCore
 
 logger = logging.getLogger("DXFImport.GeoentArc")

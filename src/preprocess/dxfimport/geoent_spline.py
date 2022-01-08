@@ -29,7 +29,7 @@ from core.point import Point
 from .spline_convert import Spline2Arcs
 from .classes import PointsClass, ContourClass
 
-import config.config as c
+import core.globals as g
 
 class GeoentSpline:
     def __init__(self, Nr=0, caller=None):
@@ -53,8 +53,8 @@ class GeoentSpline:
 
         # Zuweisen der Toleranz f�rs Fitting
         # Assign the fitting tolerance
-        tol = c.FITTING_TOLERANCE
-        CHECK = c.SPLINE_CHECK
+        tol = g.FITTING_TOLERANCE
+        CHECK = g.SPLINE_CHECK
 
         # Umwandeln zu einem ArcSpline
         # Convert to a ArcSpline

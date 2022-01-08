@@ -33,7 +33,6 @@ from core.point import Point
 from core.arcgeo import ArcGeo
 from .classes import ContourClass
 
-import globals.constants as c
 from PyQt5 import QtCore
 
 logger = logging.getLogger("DXFImport.GeoentCircle")

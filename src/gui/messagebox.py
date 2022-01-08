@@ -27,7 +27,7 @@ Special purpose canvas including all required plotting function etc.
 """
 
 import os
-import globals.constants as c
+import core.globals as g
 
 from PyQt5.QtWidgets import QTextBrowser
 from PyQt5 import QtCore
@@ -50,7 +50,7 @@ class MessageBox(QTextBrowser):
         self.setOpenExternalLinks(True)
 
         self.append(self.tr("You are using VSPlasma"))
-        self.append(self.tr("Version %s (%s)") % (c.VERSION, c.DATE))
+        self.append(self.tr("Version %s (%s)") % (g.VERSION, g.DATE))
         self.append(self.tr("For more information and updates visit:"))
         self.append("<a href='https://github.com/VectorSpaceHQ/VSPlasma'>http://sourceforge.net/projects/dxf2gcode</a>")
         self.append("")

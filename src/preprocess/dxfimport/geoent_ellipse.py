@@ -32,7 +32,7 @@ from core.point import Point
 from .biarc import BiarcClass
 from .classes import PointsClass, ContourClass
 
-import config.config as c
+import core.globals as g
 
 class GeoentEllipse(object):
     """
@@ -64,7 +64,7 @@ class GeoentEllipse(object):
         self.Read(caller)
 
         # Zuweisen der Toleranz f�rs Fitting / Assign the tolerance for fitting
-        tol = c.FITTING_TOLERANCE
+        tol = g.FITTING_TOLERANCE
 
         # Errechnen der Ellipse / Calculate the ellipse
         self.Ellipse_Grundwerte()

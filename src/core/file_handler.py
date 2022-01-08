@@ -2,7 +2,7 @@
 
 import os
 import logging
-import config.config as c
+import core.globals as g
 from preprocess.dxfimport.importer import ReadDXF
 
 from PyQt5.QtWidgets import QMainWindow, QGraphicsView, QFileDialog, QApplication, QMessageBox
@@ -14,14 +14,13 @@ getSaveFileName = QFileDialog.getSaveFileName
 logger = logging.getLogger()
 
 
-
 def open(ui):
     """
     Loads .vsp project files
     """
     ui.filename, _ = getOpenFileName(ui,
                                      "Open Project File",
-                                     c.open_path,
+                                     g.open_path,
                                      "Project Files (*.vsp)")
     if not ui.filename:
         return False  # cancelled
@@ -39,7 +38,7 @@ def import_drawing(ui, plot=True):
     """
     ui.filename, _ = getOpenFileName(ui,
                                      "Import Drawing File",
-                                     c.open_path,
+                                     g.open_path,
                                      "Drawing Files (*.dxf)")
     if not QtCore.QFile.exists(ui.filename):
         logger.info("Cannot locate file: %s" % ui.filename)
