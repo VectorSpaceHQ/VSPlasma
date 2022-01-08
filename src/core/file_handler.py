@@ -28,7 +28,7 @@ def open(ui):
     ui.setWindowTitle("VSPlasma - [%s]" % ui.filename)
     ui.canvas.resetAll()
     ui.app.processEvents()
-
+    ui.unsetCursor()
 
 def import_drawing(ui, plot=True):
     """
@@ -36,14 +36,16 @@ def import_drawing(ui, plot=True):
     make the plot.
     @param plot: if it should plot
     """
-    ui.filename, _ = getOpenFileName(ui,
-                                     "Import Drawing File",
-                                     g.open_path,
-                                     "Drawing Files (*.dxf)")
-    if not QtCore.QFile.exists(ui.filename):
-        logger.info("Cannot locate file: %s" % ui.filename)
-        if not ui.filename:
-            return False
+    # debuggging
+    ui.filename = '../tests/1in-box.dxf'
+    # ui.filename, _ = getOpenFileName(ui,
+    #                                  "Import Drawing File",
+    #                                  g.open_path,
+    #                                  "Drawing Files (*.dxf)")
+    # if not QtCore.QFile.exists(ui.filename):
+    #     logger.info("Cannot locate file: %s" % ui.filename)
+    #     if not ui.filename:
+    #         return False
 
     ui.setCursor(QtCore.Qt.WaitCursor)
     ui.setWindowTitle("VSPlasma - [%s]" % ui.filename)
@@ -52,23 +54,22 @@ def import_drawing(ui, plot=True):
 
     (name, ext) = os.path.splitext(ui.filename)
 
-
     ui.DXF_file = ReadDXF(ui.filename)
 
     # Output the information in the text window
-    logger.info(ui.tr('Loaded layers: %s') % len(ui.valuesDXF.layers))
-    logger.info(ui.tr('Loaded blocks: %s') % len(ui.valuesDXF.blocks.Entities))
-    for i in range(len(ui.valuesDXF.blocks.Entities)):
-        layers = ui.valuesDXF.blocks.Entities[i].get_used_layers()
+    logger.info(ui.tr('Loaded layers: %s') % len(ui.DXF_file.layers))
+    logger.info(ui.tr('Loaded blocks: %s') % len(ui.DXF_file.blocks.Entities))
+    for i in range(len(ui.DXF_file.blocks.Entities)):
+        layers = ui.DXF_file.blocks.Entities[i].get_used_layers()
         logger.info(ui.tr('Block %i includes %i Geometries, reduced to %i Contours, used layers: %s')
-                    % (i, len(ui.valuesDXF.blocks.Entities[i].geo), len(ui.valuesDXF.blocks.Entities[i].cont), layers))
-    layers = ui.valuesDXF.entities.get_used_layers()
-    insert_nr = ui.valuesDXF.entities.get_insert_nr()
+                    % (i, len(ui.DXF_file.blocks.Entities[i].geo), len(ui.DXF_file.blocks.Entities[i].cont), layers))
+    layers = ui.DXF_file.entities.get_used_layers()
+    insert_nr = ui.DXF_file.entities.get_insert_nr()
     logger.info(ui.tr('Loaded %i entity geometries; reduced to %i contours; used layers: %s; number of inserts %i')
-                % (len(ui.valuesDXF.entities.geo), len(ui.valuesDXF.entities.cont), layers, insert_nr))
+                % (len(ui.DXF_file.entities.geo), len(ui.DXF_file.entities.cont), layers, insert_nr))
 
     ui.units = ui.DXF_file.units
-
+    ui.unsetCursor()
 
 def OpenFileDialog(ui, title):
     ui.filename, _ = getOpenFileName(ui,

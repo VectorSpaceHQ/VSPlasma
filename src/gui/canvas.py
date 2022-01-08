@@ -19,7 +19,6 @@ class CanvasBase(QGraphicsView):
 
         self.setMouseTracking (True)
 
-
     def updateModifiers(self, event):
         """
         Handle all canvas keyboard modifiers in one place.

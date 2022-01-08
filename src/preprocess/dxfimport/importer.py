@@ -29,6 +29,7 @@ from __future__ import absolute_import
 
 from copy import deepcopy, copy
 import logging
+import core.globals as g
 
 from core.point import Point
 from .classes import ContourClass
@@ -46,6 +47,7 @@ from PyQt5.QtWidgets import QMessageBox
 from PyQt5 import QtCore
 
 logger = logging.getLogger("DxfImport.Import")
+logging.basicConfig(filename='importer.log', encoding='utf-8', level=logging.DEBUG)
 
 
 class ReadDXF(QtCore.QObject):
@@ -57,14 +59,15 @@ class ReadDXF(QtCore.QObject):
         # logger = g.logger.logger
         self.filename = filename
 
-        str_ = self.Read_File(filename)
 
-        self.units = self.Get_Unit(str_)
+        _file_content_str_ = self.Read_File(filename)
+
+        self.units = self.Get_Unit(_file_content_str_)
 
         # Load the contour and store the values in the classes
-        self.line_pairs = self.Get_Line_Pairs(str_)
+        self.line_pairs = self.Get_Line_Pairs(_file_content_str_)
 
-        # Debug Informationen
+        # Debug Information
         # logger.info(("\n\nFile has   %0.0f Lines" % len(str_)), 1)
         # logger.info(("\nFile has   %0.0f Linepairs" % self.line_pairs.nrs), 1)
 
@@ -468,7 +471,7 @@ class ReadDXF(QtCore.QObject):
         Calculate and assign the start and end points
         """
 
-        tol = g.config.point_tolerance
+        tol = g.point_tolerance
         points = []
         warning = 0
         for i in range(len(geo)):
@@ -492,7 +495,7 @@ class ReadDXF(QtCore.QObject):
         Find_Common_Points() - Find common points
         """
         # tol = self.config.points_tolerance.get()
-        tol = g.config.point_tolerance
+        tol = g.point_tolerance
 
         p_list = []
 
