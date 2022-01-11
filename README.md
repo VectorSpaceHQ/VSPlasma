@@ -7,7 +7,12 @@ VSPlasma is an open source, 2D CAM program specifically for plasma cutters. It's
   - Provide a traditional, simple, and intuitive interface. Think XFCE not Unity.
 
 # Requirements
-  sudo apt install pyqt5-dev-tools python3-pyqt5 python3-configobj qtcreator
+    To install requirements, run the following:
+
+  $ make init
+  $ apt install pyqt5-dev-tools python3-pyqt5 python3-configobj qtcreator
+
+
 
 
 # Troubleshooting

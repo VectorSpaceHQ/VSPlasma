@@ -46,7 +46,7 @@ from PyQt5.QtWidgets import QMessageBox
 from PyQt5 import QtCore
 
 logger = logging.getLogger("DxfImport.Import")
-logging.basicConfig(filename='importer.log', encoding='utf-8', level=logging.DEBUG)
+logging.basicConfig(filename='importer.log', level=logging.DEBUG)
 
 
 class ReadDXF(QtCore.QObject):
