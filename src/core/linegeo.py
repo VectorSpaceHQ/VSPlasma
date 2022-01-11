@@ -33,6 +33,8 @@ from core.point import Point
 from core.boundingbox import BoundingBox
 #from core.arcgeo import ArcGeo
 
+from PyQt5.QtGui import QPainterPath
+
 import logging
 logger = logging.getLogger("core.linegeo")
 
@@ -137,7 +139,7 @@ class LineGeo(object):
 
     def isHit(self, caller, xy, tol):
         """
-        This function returns true if the nearest point between the two geometries is within the square of the 
+        This function returns true if the nearest point between the two geometries is within the square of the
         given tolerance
         @param caller: This is the calling entities (only used in holegeo)
         @param xy: The point which shall be used to determine the distance
@@ -155,8 +157,8 @@ class LineGeo(object):
 
         self.abs_geo = LineGeo(Ps=Ps, Pe=Pe)
 
-    def make_path(self, caller, drawHorLine):
-        drawHorLine(caller, self.Ps, self.Pe)
+    def draw_entity(self, canvas_scene, pen):
+        canvas_scene.addLine(self.Ps.x, self.Ps.y, self.Pe.x, self.Pe.y, pen)
 
     def reverse(self):
         """

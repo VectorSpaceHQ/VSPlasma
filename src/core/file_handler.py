@@ -49,7 +49,7 @@ def import_drawing(ui, plot=True):
 
     ui.setCursor(QtCore.Qt.WaitCursor)
     ui.setWindowTitle("VSPlasma - [%s]" % ui.filename)
-    ui.canvas.resetAll()
+    ui.canvas_view.resetAll()
     ui.app.processEvents()
 
     (name, ext) = os.path.splitext(ui.filename)
@@ -70,6 +70,13 @@ def import_drawing(ui, plot=True):
 
     ui.units = ui.DXF_file.units
     ui.unsetCursor()
+
+
+    # ui.geometry = importer.make_geometry_from_dxf(dxfobj)
+
+    # ui.canvas_scene.plotAll()
+
+
 
 def OpenFileDialog(ui, title):
     ui.filename, _ = getOpenFileName(ui,

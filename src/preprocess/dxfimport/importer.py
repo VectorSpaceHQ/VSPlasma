@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import absolute_import
-from __future__ import division
 
 ############################################################################
 #
@@ -30,6 +28,7 @@ from __future__ import absolute_import
 from copy import deepcopy, copy
 import logging
 import core.globals as g
+import core.geometry as geometry
 
 from core.point import Point
 from .classes import ContourClass
@@ -906,3 +905,67 @@ class BlocksClass:
         for entitie in self.Entities:
             s += str(entitie)
         return s
+
+
+def make_geometry_from_dxf(ui):
+    """
+    Takes a ReadDXF object and translates into Parts, Layers, and Shapes
+    Entities -> parts
+    Blocks
+    Layers -> groups
+    Geo -> shapes
+    """
+    dxfobj = ui.DXF_file
+
+    # Initialize geometry components
+    shapes = geometry.Shapes()
+    groups = geometry.Groups()
+    parts = geometry.Parts()
+
+    # Initialize the part. 1 drawing = 1 part
+    filename = dxfobj.filename
+    p = geometry.Part(name=filename, collector=parts)
+
+    # Create all Group objects
+    for idx, l in enumerate(dxfobj.layers):
+        g = geometry.Group(part=p, nr=idx, name=l.name, collector=groups)
+
+    # Create Shape objects found in each Group
+    for e in dxfobj.entities.geo:
+        # connect geo to group
+        layer_nr = e.Layer_Nr
+        g = None
+        for group in groups.values():
+            if group.nr == layer_nr:
+                g = group
+
+    for idx, contour in enumerate(dxfobj.entities.cont):
+        geo_list = []
+        for geo_a, geo_b in contour.order:
+            line_geo_a = dxfobj.entities.geo[geo_a].geo[-1]
+            line_geo_b = dxfobj.entities.geo[geo_b].geo[-1]
+            geo_list.append(line_geo_a)
+            geo_list.append(line_geo_b)
+            layer_nr = dxfobj.entities.geo[geo_a].Layer_Nr
+            for group in groups.values():
+                if group.nr == layer_nr:
+                    g = group
+
+        geo_set = set(geo_list) # remove duplicates
+        geo_list = list(geo_set)
+        shape = geometry.Shape(nr=idx+1, group=group, geos=geo_list, collector=shapes)
+
+    # Add objects to main ui container
+    ui.geometry = geometry.Geometry(Parts=parts, Groups=groups, Shapes=shapes)
+
+    # print("report:\n\n")
+    # print(parts)
+    # print(parts[filename])
+    # print(parts[filename].groups)
+    # print("group names",groups.names)
+    # print(groups[groups.names[0]])
+    # print("first group name:", groups[groups.names[0]].name)
+    # print("num contours:", groups[groups.names[0]].num_contours)
+    # print(groups[groups.names[0]].contours)
+    # print(shapes)
+    # print(len(shapes[0].geos))

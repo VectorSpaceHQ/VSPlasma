@@ -1,11 +1,18 @@
 # -*- coding: utf-8 -*-
 
+from core.boundingbox import BoundingBox
+# from core.stmove import StMove
+
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsView, QRubberBand, QGraphicsScene, QGraphicsLineItem
 from PyQt5.QtGui import QPainterPath, QPen, QColor, QPainterPathStroker, QMouseEvent
 from PyQt5 import QtCore
 
 
 def Canvas(parent=None):
+    """
+    Called by vsplasma_ui.py to create ui.canvasView, which then becomes
+    self.ui.canvas in vsplasma.py.
+    """
     return MyGraphicsView(parent)
 
 
@@ -59,9 +66,11 @@ class CanvasBase(QGraphicsView):
 
 class MyGraphicsView(CanvasBase):
     """
-    This is the used Canvas to print the graphical interface of dxf2gcode.
-    All GUI things should be performed in the View and plotting functions in
-    the scene
+    The QGraphicsView class provides a widget for displaying the contents of
+    a QGraphicsScene.
+
+    MyGraphicsView controls the UI.
+    MyGraphicsScene controls the canvas rendering.
     """
 
     def __init__(self, parent=None):
@@ -262,12 +271,14 @@ class MyGraphicsView(CanvasBase):
         scene = self.scene()
         del scene
 
+
 class MyGraphicsScene(QGraphicsScene):
     """
-    This is the Canvas used to print the graphical interface of dxf2gcode.
-    The Scene is rendered into the previously defined mygraphicsView class.
-    All performed plotting functions should be defined here.
-    @sideeffect: None
+    The QGraphicsScene class provides a surface for managing a large number of
+    2D graphical items.
+
+    MyGraphicsView controls the UI.
+    MyGraphicsScene controls the canvas rendering.
     """
     def __init__(self):
         QGraphicsScene.__init__(self)
@@ -306,158 +317,10 @@ class MyGraphicsScene(QGraphicsScene):
         self.draw_wp_zero()
         self.update()
 
-    def repaint_shape(self, shape):
-        # setParentItem(None) might let it crash, hence we rely on the garbage collector
-        shape.stmove.hide()
-        shape.starrow.hide()
-        shape.enarrow.hide()
-        del shape.stmove
-        del shape.starrow
-        del shape.enarrow
-        self.paint_shape(shape)
-        if not shape.isSelected():
-            shape.stmove.hide()
-            shape.starrow.hide()
-            shape.enarrow.hide()
+    def draw_shapes(self, geometry):
+        for shape in geometry.shapes:
+            shape.make_paint_path(self)
+        self.BB = BoundingBox()
 
-    def paint_shape(self, shape):
-        """
-        Create all plotting related parts of one shape.
-        @param shape: The shape to be plotted.
-        """
-        start, start_ang = shape.get_start_end_points(True, True)
-        shape.path = QPainterPath()
-        shape.path.moveTo(start.x, -start.y)
-        drawHorLine = lambda caller, start, end: shape.path.lineTo(end.x, -end.y)
-        drawVerLine = lambda caller, start: None  # Not used in 2D mode
-        shape.make_path(drawHorLine, drawVerLine)
-
-        self.BB = self.BB.joinBB(shape.BB)
-
-        shape.stmove = self.createstmove(shape)
-        shape.starrow = self.createstarrow(shape)
-        shape.enarrow = self.createenarrow(shape)
-        shape.stmove.setParentItem(shape)
-        shape.starrow.setParentItem(shape)
-        shape.enarrow.setParentItem(shape)
-
-    def draw_wp_zero(self):
-        """
-        This function is called while the drawing of all items is done. It plots
-        the WPZero to the Point x=0 and y=0. This item will be enabled or
-        disabled to be shown or not.
-        """
-        self.wpzero = WpZero(QtCore.QPointF(0, 0))
-        self.addItem(self.wpzero)
-
-    def createstarrow(self, shape):
-        """
-        This function creates the Arrows at the end point of a shape when the
-        shape is selected.
-        @param shape: The shape for which the Arrow shall be created.
-        """
-
-        length = 20
-        start, start_ang = shape.get_start_end_points_physical(True, True)
-        arrow = Arrow(startp=start,
-                      length=length,
-                      angle=start_ang,
-                      color=QColor(50, 200, 255),
-                      pencolor=QColor(50, 100, 255))
-        return arrow
-
-    def createenarrow(self, shape):
-        """
-        This function creates the Arrows at the end point of a shape when the
-        shape is selected.
-        @param shape: The shape for which the Arrow shall be created.
-        """
-        length = 20
-        end, end_ang = shape.get_start_end_points_physical(False, True)
-        arrow = Arrow(startp=end,
-                      length=length,
-                      angle=end_ang,
-                      color=QColor(0, 245, 100),
-                      pencolor=QColor(0, 180, 50),
-                      startarrow=False)
-        return arrow
-
-    def createstmove(self, shape):
-        """
-        This function creates the Additional Start and End Moves in the plot
-        window when the shape is selected
-        @param shape: The shape for which the Move shall be created.
-        """
-        stmove = StMoveGUI(shape)
-        return stmove
-
-    def delete_opt_paths(self):
-        """
-        This function deletes all the plotted export routes.
-        """
-        # removeItem might let it crash, hence we rely on the garbage collector
-        while self.routearrows:
-            item = self.routearrows.pop()
-            item.hide()
-            del item
-
-        while self.routetext:
-            item = self.routetext.pop()
-            item.hide()
-            del item
-
-    def addexproutest(self):
-        self.expprv = Point(g.config.vars.Plane_Coordinates['axis1_start_end'],
-                            g.config.vars.Plane_Coordinates['axis2_start_end'])
-        self.expcol = QtCore.Qt.darkRed
-
-    def addexproute(self, exp_order, layer_nr):
-        """
-        This function initialises the Arrows of the export route order and its numbers.
-        """
-        for shape_nr in range(len(exp_order)):
-            shape = self.shapes[exp_order[shape_nr]]
-            st = self.expprv
-            en, self.expprv = shape.get_start_end_points_physical()
-            self.routearrows.append(Arrow(startp=en,
-                                          endp=st,
-                                          color=self.expcol,
-                                          pencolor=self.expcol))
-
-            self.expcol = QtCore.Qt.darkGray
-
-            self.routetext.append(RouteText(text=("%s,%s" % (layer_nr, shape_nr+1)),
-                                            startp=en))
-            # self.routetext[-1].ItemIgnoresTransformations
-
-            self.addItem(self.routearrows[-1])
-            self.addItem(self.routetext[-1])
-
-    def addexprouteen(self):
-        st = self.expprv
-        en = Point(g.config.vars.Plane_Coordinates['axis1_start_end'],
-                   g.config.vars.Plane_Coordinates['axis2_start_end'])
-        self.expcol = QtCore.Qt.darkRed
-
-        self.routearrows.append(Arrow(startp=en,
-                                      endp=st,
-                                      color=self.expcol,
-                                      pencolor=self.expcol))
-
-        self.addItem(self.routearrows[-1])
-
-    def setShowDisabledPaths(self, flag):
-        """
-        This function is called by the Main Menu and is passed from Main to
-        MyGraphicsView to the Scene. It performs the showing or hiding
-        of enabled/disabled shapes.
-
-        @param flag: This flag is true if hidden paths shall be shown
-        """
-        self.showDisabledPaths = flag
-
-        for shape in self.shapes:
-            if flag and shape.isDisabled():
-                shape.show()
-            elif not flag and shape.isDisabled():
-                shape.hide()
+    def draw_operations(self, operations):
+        pass

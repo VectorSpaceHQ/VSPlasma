@@ -2,10 +2,31 @@
 
 # All geometric entities are structured as follows:
 # A Part has Layers which have Shapes
-# A Contour is made of points
+# A Shape is made of points
 
-import core.shape as shape
 import core.point as point
+from PyQt5.QtGui import QPainterPath, QPen, QColor
+
+
+class Geometry():
+    def __init__(self, Parts=None, Groups=None, Shapes=None):
+        self.parts = Parts
+        self.groups = Groups
+        self.shapes = Shapes
+
+
+class Geos(list):
+    def __init__(self, *args):
+        list.__init__(self, *args)
+
+    def abs_iter(self):
+        for geo in list.__iter__(self):
+            yield geo.abs_geo if geo.abs_geo else geo
+
+    def abs_el(self, element):
+        print("abs_el:",element)
+        return self[element].abs_geo if self[element].abs_geo else self[element]
+
 
 class Parts(dict):
     def __init__(self):
@@ -20,8 +41,48 @@ class Parts(dict):
         return string
 
 
+class Groups(dict):
+    """
+    {"group_name": group_obj,
+     }
+
+    """
+    def __init__(self):
+        self.count = 0
+        self.names = []
+
+    def __str__(self):
+        string = ''
+        for l in self.values():
+            string += "name: " + str(l.name) + "\n"
+            string += "number: " + str(l.nr) + "\n"
+        return string
+
+    def add_group(self, group):
+        if group not in self.values():
+            self[group.name] = group
+            self.names.append(group.name)
+            self.count += 1
+
+
+class Shapes(list):
+    def __init__(self):
+        self.count = 0
+
+    def __str__(self):
+        string = 'There are {} total Shapes.'.format(self.count)
+        for contour in self:
+            string += str(contour) + "\n"
+        return string
+
+    def add_contour(self, contour):
+        if contour not in self:
+            self.append(contour)
+            self.count += 1
+
+
 class Part(dict):
-    def __init__(self, name=None):
+    def __init__(self, name=None, collector=None):
         self.name = name
         self.layers = None
         self.active = False
@@ -33,7 +94,7 @@ class Part(dict):
         self.groups = []
 
         try:
-            parts[self.name] = self # add to collection
+            collector[self.name] = self # add to collection
         except Exception as e:
             print("A group must belong to a part")
 
@@ -58,10 +119,10 @@ class Part(dict):
 
 class Group():
     """
-    A group of contours, often called a Layer in 2D drawing.
     A group must belong to a part.
+    Must contain shapes.
     """
-    def __init__(self, nr=-1, part=None, name=None):
+    def __init__(self, nr=-1, part=None, name=None, collector=None, shapes=None):
         self.shapes = None
         self.active = False
         self.selected = False
@@ -75,7 +136,7 @@ class Group():
 
         try:
             self.parent = part
-            groups.add_group(self) # add to collection
+            collector.add_group(self) # add to collection
             part.add_group(self) # add to parent
         except Exception as e:
             print("A group must belong to a part")
@@ -86,63 +147,29 @@ class Group():
             self.num_contours += 1
 
 
-class Groups(dict):
+class Shape():
     """
+    One or more geometric shapes: Line, Arc, etc.
     """
-    def __init__(self, group=None):
-        self.count = 0
-        self.names = []
-
-    def __str__(self):
-        string = ''
-        for l in self.values():
-            string += "name: " + str(l.name) + "\n"
-            string += "number: " + str(l.nr) + "\n"
-        return string
-
-    def add_group(self, group):
-        if group not in self.values():
-            self[group.name] = group
-            self.names.append(group.name)
-            self.count += 1
-
-
-class Contours(list):
-    def __init__(self):
-        self.count = 0
-
-    def __str__(self):
-        string = 'There are {} total Contours.'.format(self.count)
-        for contour in self:
-            string += str(contour) + "\n"
-        return string
-
-    def add_contour(self, contour):
-        if contour not in self:
-            self.append(contour)
-            self.count += 1
-
-
-class Contour():
-    """
-    A Shape is a single continuous contour.
-    """
-    def __init__(self, nr=-1, group=None, closed=True, geos=[]):
-        self.active = False
+    def __init__(self, nr=-1, group=None, closed=True, collector=None, geos=[]):
         self.selected = False
         self.disabled = False
         self.locked = False
         self.nr = nr
         self.closed = closed
+        self.start_point = None
+        self.end_point = None
+        self.BB = None
+        self.geos = Geos(geos)
 
-        self.geos = shape.Geos(geos)
+        # self.make_paint_path()
 
         try:
             self.parent = group
             group.add_contour(self) # add to parent
-            contours.add_contour(self) # add to convenience collection
+            collector.add_contour(self) # add to convenience collection
         except Exception as e:
-            print("A contour must belong to a group.")
+            print("A shape must belong to a group.")
             print(e)
 
     def __str__(self):
@@ -150,10 +177,11 @@ class Contour():
         Standard method to print the object
         @return: A string
         """
-        return "\nContour:" +\
+        return "\nShape:" +\
                "\nnr:          %i" % self.nr +\
                "\nclosed:      %s" % self.closed +\
-               "\ngeos:        %s" % self.geo
+               "\nGroup:       %s" % self.parent.name +\
+               "\ngeos:        %s" % self.geos
 
     def setSelected(self, flag=False):
         self.selected = flag
@@ -176,64 +204,26 @@ class Contour():
             self.BB = self.BB.joinBB(geo.BB)
 
     def get_start_end_points(self, start_point=None, angles=None):
-        if start_point is None:
-            return (self.geos.abs_el(0).get_start_end_points(True, angles),
-                    self.geos.abs_el(-1).get_start_end_points(False, angles))
-        elif start_point:
-            return self.geos.abs_el(0).get_start_end_points(True, angles)
+        self.start_point = [self.geos[0].x, self.geos[0].y]
+        self.end_point = [self.geos[0].x, self.geos[0].y]
+        # if start_point is None:
+        #     return (self.geos.abs_el(0).get_start_end_points(True, angles),
+        #             self.geos.abs_el(-1).get_start_end_points(False, angles))
+        # elif start_point:
+        #     return self.geos.abs_el(0).get_start_end_points(True, angles)
+        # else:
+        #     return self.geos.abs_el(-1).get_start_end_points(False, angles)
+
+    def make_paint_path(self, canvas_scene):
+        """
+        Draws QPainterPath regardless of entity type (line, Arc, etc)
+        """
+        pen = QPen()
+        if self.selected:
+            pen.setColor(QColor('blue'))
         else:
-            return self.geos.abs_el(-1).get_start_end_points(False, angles)
+            pen.setColor(QColor('black'))
 
-
-def build_from_dxf(dxfobj):
-    """
-    Takes a ReadDXF object and translates into Parts, Layers, and Shapes
-    Entities -> parts
-    Blocks
-    Layers -> groups
-    Geo -> contours
-    """
-
-    filename = dxfobj.filename
-    p = Part(name=filename)
-
-    for idx, l in enumerate(dxfobj.layers):
-        g = Group(part=p, nr=idx, name=l.name)
-
-
-    print("\n\n",groups)
-
-    print("\nblocks:\n", dxfobj.blocks)
-
-    print("\nentities:\n", dxfobj.entities)
-    for e in dxfobj.entities.geo:
-        # connect geo to group
-        layer_nr = e.Layer_Nr
-        g = None
-        for group in groups.values():
-            if group.nr == layer_nr:
-                g = group
-
-        c = Contour(group=g)
-        c.nr = e.Nr
-        c.parent_layer = e.Layer_Nr
-        c.geo = e.geo
-
-
-    # print("report:\n\n")
-    # print(parts)
-    # print(parts[filename])
-    # print(parts[filename].groups)
-    # print("group names",groups.names)
-    # print(groups[groups.names[0]])
-    # print(groups[groups.names[0]].name)
-    # print("num contours:", groups[groups.names[0]].num_contours)
-    # print(groups[groups.names[0]].contours)
-    # print(contours)
-    # print(contours[0].geo)
-
-    # print(contours)
-
-contours = Contours()
-groups = Groups()
-parts = Parts()
+        if not self.disabled:
+            for geo in self.geos:
+                geo.draw_entity(canvas_scene, pen)
