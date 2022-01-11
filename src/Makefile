@@ -1,6 +1,6 @@
 build:
 	# Make py file from ui
-	pyuic5 ./gui/vsplasma-new.ui -o ./gui/vsplasma_ui.py
+	pyuic5 ./gui/vsplasma.ui -o ./gui/vsplasma_ui.py
 	# Make resource file for icons
 	pyrcc5 ./gui/resources.qrc -o ./gui/resources_rc.py
 
