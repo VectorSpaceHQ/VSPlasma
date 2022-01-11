@@ -25,16 +25,13 @@ import sys
 import pprint
 import logging
 import yaml
+import core.globals as g
 
 from collections import OrderedDict
 from configobj import ConfigObj, flatten_errors
 from validate import Validator
-import globals.globals as g
-import globals.constants as c
 
 from PyQt5 import QtCore
-
-DEFAULT_CONFIG_DIR = "~/.config/vsplasma"
 
 
 class ToolTable(dict):
@@ -43,7 +40,7 @@ class ToolTable(dict):
     """
     def __init__(self):
         self._list = []
-        self.folder = os.path.join(g.folder, DEFAULT_CONFIG_DIR)
+        self.folder = os.path.join('', g.DEFAULT_CONFIG_DIR)
         self.filename = os.path.join(self.folder, 'tooltable.cfg')
         self.tool_count = 0
 

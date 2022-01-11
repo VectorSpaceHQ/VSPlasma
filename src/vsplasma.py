@@ -7,6 +7,9 @@ import gui.vsplasma_ui as vsplasma_ui
 import core.file_handler as file_handler
 import gui
 import preprocess.dxfimport.importer as importer
+import core.tooltable as tooltable
+import core.globals as globals
+import gui.tools_tab as tools_tab
 
 
 from PyQt5.QtWidgets import QMainWindow, QGraphicsView, QFileDialog, QApplication, QMessageBox
@@ -43,16 +46,22 @@ class MainWindow(QMainWindow):
         self.ui.setupUi(self)
         self.showMaximized()
 
+        self.tools = tooltable.ToolTable()
         self.setup_graphics()
-
 
         self.connect_signals()
 
     def setup_graphics(self):
-        self.canvas_scene = gui.canvas.MyGraphicsScene()
 
+        # Tool table tab
+        self.ToolsTab = tools_tab.ToolsTab(self.ui, self.tools)
+
+        # Canvas
+        self.canvas_scene = gui.canvas.MyGraphicsScene()
         self.canvas_view = self.ui.canvasView
         self.canvas_view.setScene(self.canvas_scene)
+
+
 
         # path = QPainterPath()
         # pen = QPen()
