@@ -328,6 +328,9 @@ class ArcGeo(object):
             drawHorLine(caller, Ps, Pe)
             Ps = Pe
 
+    # def draw_entity(self, canvas_scene, pen):
+    #     canvas_scene.addLine(self.Ps.x, self.Ps.y, self.Pe.x, self.Pe.y, pen)
+
     def reverse(self):
         """
         Reverses the direction of the arc (switch direction).
