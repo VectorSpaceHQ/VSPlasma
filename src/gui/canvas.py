@@ -319,8 +319,8 @@ class MyGraphicsScene(QGraphicsScene):
 
     def draw_shapes(self, geometry):
         for shape in geometry.shapes:
-            shape.make_paint_path(self)
-        self.BB = BoundingBox()
+            # shape.paint_shape(self)
+            shape.make_paint_path()
 
     def draw_operations(self, operations):
         pass

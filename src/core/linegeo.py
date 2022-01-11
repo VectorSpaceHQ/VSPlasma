@@ -160,6 +160,10 @@ class LineGeo(object):
     def draw_entity(self, canvas_scene, pen):
         canvas_scene.addLine(self.Ps.x, self.Ps.y, self.Pe.x, self.Pe.y, pen)
 
+    def make_path(self, path):
+        path.moveTo(self.Ps.x, self.Ps.y)
+        path.lineTo(self.Pe.x, self.Pe.y)
+
     def reverse(self):
         """
         Reverses the direction of the arc (switch direction).

@@ -38,6 +38,7 @@ def import_drawing(ui, plot=True):
     """
     # debuggging
     ui.filename = "../tests/circle-layers.dxf"
+    ui.filename = "../tests/1in-box.dxf"
     # ui.filename, _ = getOpenFileName(ui,
     #                                  "Import Drawing File",
     #                                  g.open_path,
