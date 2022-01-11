@@ -319,14 +319,21 @@ class ArcGeo(object):
 
         self.abs_geo = ArcGeo(Ps=Ps, Pe=Pe, O=O, r=r, direction=direction, drag=self.drag)
 
-    def make_path(self, caller, drawHorLine):
-        segments = int(abs(degrees(self.ext)) // 3 + 1)
-        Ps = self.O.get_arc_point(self.s_ang, self.r)
+    def make_path(self, path):
+        center_x = self.O.x
+        center_y = self.O.y
 
-        for i in range(1, segments + 1):
-            Pe = self.get_point_from_start(i, segments)
-            drawHorLine(caller, Ps, Pe)
-            Ps = Pe
+        left = -self.r
+        top = -self.r
+        width = self.r * 2
+        height = width
+        rect = QtCore.QRectF(left, top, width, height)
+
+        start_angle = self.s_ang * 180/pi
+        end_angle = self.e_ang * 180/pi
+
+        path.moveTo(self.Ps.x, -self.Ps.y)
+        path.arcTo(rect, start_angle, end_angle - start_angle)
 
     def draw_entity(self, canvas_scene, pen):
         canvas_scene.addLine(self.Ps.x, self.Ps.y, self.Pe.x, self.Pe.y, pen)

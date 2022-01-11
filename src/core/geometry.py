@@ -214,7 +214,7 @@ class Shape():
         # else:
         #     return self.geos.abs_el(-1).get_start_end_points(False, angles)
 
-    def make_paint_path(self, canvas_scene):
+    def make_paint_path(self, canvas_scene, pen):
         """
         Render shape with path technique. More flexible support of shapes found
         in vector formats but has to be done in correct order.
@@ -225,7 +225,7 @@ class Shape():
             for geo in self.geos:
                 geo.make_path(self.path)
 
-        canvas_scene.addPath(self.path)
+        canvas_scene.addPath(self.path, pen)
 
     def paint_shape(self, canvas_scene):
         """
