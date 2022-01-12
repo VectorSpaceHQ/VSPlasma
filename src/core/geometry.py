@@ -33,10 +33,12 @@ class Parts(dict):
         self.name = None
 
     def __str__(self):
-        string = 'There are {} total Parts:\n'.format(str(len(self)))
+        string = '\nThere are {} total Parts:\n'.format(str(len(self)))
         i = 1
         for k, v in self.items():
-            string += "Part num "+ str(i) + " " + str(k) + ": " + str(v)
+            string += "Part\n"
+            string += "nr: "+ str(i) + "\n"
+            string += "name: " + str(k) +"\n"
             i += 1
         return string
 
@@ -52,7 +54,7 @@ class Groups(dict):
         self.names = []
 
     def __str__(self):
-        string = ''
+        string = '\nThere are {} total Groups:\n'.format(str(len(self)))
         for l in self.values():
             string += "name: " + str(l.name) + "\n"
             string += "number: " + str(l.nr) + "\n"
@@ -70,7 +72,7 @@ class Shapes(list):
         self.count = 0
 
     def __str__(self):
-        string = 'There are {} total Shapes.'.format(self.count)
+        string = '\nThere are {} total Shapes:'.format(self.count)
         for contour in self:
             string += str(contour) + "\n"
         return string
@@ -161,6 +163,7 @@ class Shape():
         self.end_point = None
         self.BB = None
         self.geos = Geos(geos)
+        # self.elements = Elements(geos) # this will eventually replace Geos
 
         # self.make_paint_path()
 
@@ -240,3 +243,25 @@ class Shape():
         if not self.disabled:
             for geo in self.geos:
                 geo.draw_entity(canvas_scene, pen)
+
+
+class Elements():
+    def __init__(self):
+        pass
+
+
+class Element():
+    """
+    Elements make up shapes. Elements include Line, Arc, Spline, Ellipse, etc.
+    """
+    def __init__(self, start_point=None, end_point=None):
+        self.start_point = start_point
+        self.end_point = end_point
+
+        self.calc_bounding_box()
+
+    def __str__(self):
+        pass
+
+    def make_path(self):
+        pass

@@ -953,11 +953,14 @@ def make_geometry_from_dxf(ui):
 
         geo_set = set(geo_list) # remove duplicates
         geo_list = list(geo_set)
-        shape = geometry.Shape(nr=idx+1, group=group, geos=geo_list, collector=shapes)
+        shape = geometry.Shape(nr=idx, group=g, geos=geo_list, collector=shapes)
 
     # Add objects to main ui container
     ui.geometry = geometry.Geometry(Parts=parts, Groups=groups, Shapes=shapes)
 
+    print(parts)
+    print(groups)
+    print(shapes)
     # print("report:\n\n")
     # print(parts)
     # print(parts[filename])
