@@ -955,6 +955,7 @@ def make_geometry_from_dxf(ui):
                 for group in groups.values():
                     if group.nr == layer_nr:
                         g = group
+                        break
 
 
         geo_set = set(geo_list) # remove duplicates
