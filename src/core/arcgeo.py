@@ -27,6 +27,7 @@
 from __future__ import absolute_import
 from __future__ import division
 
+import math
 from math import sqrt, sin, cos, asin, pi, degrees, ceil, floor
 from copy import deepcopy
 
@@ -333,7 +334,7 @@ class ArcGeo(object):
         end_angle = self.e_ang * 180/pi
 
         path.moveTo(self.Ps.x, -self.Ps.y)
-        path.arcTo(rect, start_angle, end_angle - start_angle)
+        path.arcTo(rect, start_angle, math.fabs(end_angle - start_angle)) # always draw clockwise
 
     def draw_entity(self, canvas_scene, pen):
         canvas_scene.addLine(self.Ps.x, self.Ps.y, self.Pe.x, self.Pe.y, pen)

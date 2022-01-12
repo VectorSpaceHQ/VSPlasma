@@ -320,7 +320,7 @@ class MyGraphicsScene(QGraphicsScene):
     def draw_shapes(self, geometry):
         pens = [QPen(QColor("blue")), QPen(QColor("red")), QPen(QColor("green"))]
         for idx, shape in enumerate(geometry.shapes):
-            shape.make_paint_path(self, QPen(QColor("blue")))
+            shape.make_paint_path(self)
 
     def draw_operations(self, operations):
         pass

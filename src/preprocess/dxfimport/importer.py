@@ -932,6 +932,8 @@ def make_geometry_from_dxf(ui):
 
     # Create Shape objects found in each Group
     for e in dxfobj.entities.geo:
+        # print(e) # this is the geoent
+        # print(e.geo) # this is the arcgeo. I don't fully understand
         # connect geo to group
         layer_nr = e.Layer_Nr
         g = None
@@ -942,14 +944,18 @@ def make_geometry_from_dxf(ui):
     for idx, contour in enumerate(dxfobj.entities.cont):
         geo_list = []
         for geo_a, geo_b in contour.order:
-            line_geo_a = dxfobj.entities.geo[geo_a].geo[-1]
-            line_geo_b = dxfobj.entities.geo[geo_b].geo[-1]
-            geo_list.append(line_geo_a)
-            geo_list.append(line_geo_b)
-            layer_nr = dxfobj.entities.geo[geo_a].Layer_Nr
-            for group in groups.values():
-                if group.nr == layer_nr:
-                    g = group
+            j = 0
+            while j < len(dxfobj.entities.geo[geo_a].geo):
+                line_geo_a = dxfobj.entities.geo[geo_a].geo[j]
+                line_geo_b = dxfobj.entities.geo[geo_b].geo[j]
+                geo_list.append(line_geo_a)
+                geo_list.append(line_geo_b)
+                layer_nr = dxfobj.entities.geo[geo_a].Layer_Nr
+                j += 1
+                for group in groups.values():
+                    if group.nr == layer_nr:
+                        g = group
+
 
         geo_set = set(geo_list) # remove duplicates
         geo_list = list(geo_set)

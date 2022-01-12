@@ -217,11 +217,17 @@ class Shape():
         # else:
         #     return self.geos.abs_el(-1).get_start_end_points(False, angles)
 
-    def make_paint_path(self, canvas_scene, pen):
+    def make_paint_path(self, canvas_scene):
         """
         Render shape with path technique. More flexible support of shapes found
         in vector formats but has to be done in correct order.
         """
+        pen = QPen()
+        if self.selected:
+            pen.setColor(QColor('blue'))
+        else:
+            pen.setColor(QColor('black'))
+
         self.path = QPainterPath()
 
         if not self.disabled:

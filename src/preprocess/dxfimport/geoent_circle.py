@@ -120,6 +120,7 @@ class GeoentCircle(object):
         self.geo.append(ArcGeo(Ps=Ps, Pe=Pm, O=O, r=r, s_ang=s_ang, e_ang=m_ang, direction=-1))
         self.geo.append(ArcGeo(Ps=Pm, Pe=Pe, O=O, r=r, s_ang=m_ang, e_ang=e_ang, direction=-1))
 
+
         # Length corresponds to the length (circumference?) of the circle
         self.length = self.geo[-1].length+self.geo[-2].length
 
