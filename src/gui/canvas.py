@@ -107,11 +107,7 @@ class MyGraphicsView(CanvasBase):
         Create the contextmenu.
         @purpose: Links the new Class of ContextMenu to Graphicsview.
         """
-        position = self.mapToGlobal(event.pos())
-        GVPos = self.mapToScene(event.pos())
-        real_pos = Point(GVPos.x(), -GVPos.y())
-
-        menu = MyDropDownMenu(self.scene(), position, real_pos)
+        pass
 
     def wheelEvent(self, event):
         """
@@ -132,16 +128,11 @@ class MyGraphicsView(CanvasBase):
         """
         if event.button() == QtCore.Qt.MidButton:
             self.setDragMode(QGraphicsView.ScrollHandDrag)
-            self.original_event = event
-            handmade_event = QMouseEvent(QtCore.QEvent.MouseButtonPress,QtCore.QPointF(event.pos()),QtCore.Qt.LeftButton,event.buttons(),QtCore.Qt.KeyboardModifiers())
-            self.mousePressEvent(handmade_event)
-            super(MyGraphicsView, self).mousePressEvent(event)
-        if self.dragMode() == 1:
-            super(MyGraphicsView, self).mousePressEvent(event)
-        elif event.button() == QtCore.Qt.LeftButton:
-            self.mppos = event.pos()
-        else:
-            pass
+            # self.original_event = event
+            # handmade_event = QMouseEvent(QtCore.QEvent.MouseButtonPress,QtCore.QPointF(event.pos()),QtCore.Qt.LeftButton,event.buttons(),QtCore.Qt.KeyboardModifiers())
+            # self.mousePressEvent(handmade_event)
+            # super(MyGraphicsView, self).mousePressEvent(event)
+
 
     def mouseReleaseEvent(self, event):
         """
@@ -150,8 +141,6 @@ class MyGraphicsView(CanvasBase):
         @purpose: Change inherited mousePressEvent
         @param event: Event Parameters passed to function
         """
-        delta = 2
-
         if event.button() == QtCore.Qt.MidButton:
             self.setDragMode(QGraphicsView.NoDrag)
 
@@ -163,52 +152,6 @@ class MyGraphicsView(CanvasBase):
         # Selection only enabled for left Button
         elif event.button() == QtCore.Qt.LeftButton:
             self.currentItems = []
-            scene = self.scene()
-            if scene and not self.isMultiSelect:
-                for item in scene.selectedItems():
-                    item.setSelected(False, False)
-            # If the mouse button is pressed without movement of rubberband
-            if self.rubberBand.isHidden():
-                rect = QtCore.QRect(event.pos().x()-delta,
-                                    event.pos().y() - delta,
-                                    2 * delta, 2*delta)
-                # logger.debug(rect)
-
-                point = self.mapToScene(event.pos())
-                min_distance = float(0x7fffffff)
-                for item in self.items(rect):
-                    itemDistance = item.contains_point(point)
-                    if itemDistance < min_distance:
-                        min_distance = itemDistance
-                        self.currentItems = item
-                if self.currentItems:
-                    if self.currentItems.isSelected():
-                        self.currentItems.setSelected(False, False)
-                    else:
-                        self.currentItems.setSelected(True, False)
-            else:
-                rect = self.rubberBand.geometry()
-                self.currentItems = self.items(rect)
-                self.rubberBand.hide()
-                # logger.debug("Rubberband Selection")
-
-                # All items in the selection
-                # self.currentItems = self.items(rect)
-                # print self.currentItems
-                # logger.debug(rect)
-
-                for item in self.currentItems:
-                    if item.isSelected():
-                        item.setSelected(False, False)
-                    else:
-                        # print (item.flags())
-                        item.setSelected(True, False)
-
-        else:
-            pass
-
-        self.mppos = None
-        # super(MyGraphicsView, self).mouseReleaseEvent(event)
 
     def mouseMoveEvent(self, event):
         """
