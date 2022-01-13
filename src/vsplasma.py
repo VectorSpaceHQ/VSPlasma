@@ -11,6 +11,8 @@ import core.tooltable as tooltable
 import core.globals as globals
 import gui.tools_tab as tools_tab
 import gui.operations_tab as operations_tab
+import core.workpiece as workpiece
+import gui.setup_tab as setup_tab
 
 from PyQt5.QtWidgets import QMainWindow, QGraphicsView, QFileDialog, QApplication, QMessageBox
 from PyQt5.QtGui import QSurfaceFormat
@@ -47,22 +49,25 @@ class MainWindow(QMainWindow):
         self.showMaximized()
 
         self.tools = tooltable.ToolTable()
+        self.workpiece = workpiece.Workpiece()
         self.setup_graphics()
 
         self.connect_signals()
 
     def setup_graphics(self):
-        # Tool table tab
-        self.ToolsTab = tools_tab.ToolsTab(self.ui, self.tools)
-
-        # Operations tab
-        self.OperationTab = operations_tab.OperationsTab(self.ui, self.tools)
-
         # Canvas
         self.canvas_scene = gui.canvas.MyGraphicsScene()
         self.canvas_view = self.ui.canvasView
         self.canvas_view.setScene(self.canvas_scene)
 
+        # Setup Tab
+        self.SetupTab = setup_tab.SetupTab(self, self.ui, self.workpiece, self.canvas_scene)
+
+        # Tool table tab
+        self.ToolsTab = tools_tab.ToolsTab(self.ui, self.tools)
+
+        # Operations tab
+        self.OperationTab = operations_tab.OperationsTab(self.ui, self.tools)
 
     def connect_signals(self):
         # File
@@ -72,11 +77,6 @@ class MainWindow(QMainWindow):
         self.ui.actionSave.triggered.connect(lambda: file_handler.saveProject(self))
         self.ui.generate_paths_action.pressed.connect(self.generate_paths)
         self.ui.save_gcode_action.pressed.connect(self.save_gcode)
-
-
-
-    def test(self):
-        print("TESTING")
 
     def save_gcode(self):
         pass
@@ -91,7 +91,15 @@ class MainWindow(QMainWindow):
         importer.make_geometry_from_dxf(self)
 
         # plot graphics objects
-        self.canvas_scene.draw_shapes(self.geometry)
+        self.canvas_scene.draw_all(self)
+
+    def refresh(self):
+        print("REFRESH")
+        # plot graphics objects
+        self.canvas_view.items().clear()
+        self.canvas_scene.clear()
+        self.canvas_scene.draw_all(self)
+
 
 
 

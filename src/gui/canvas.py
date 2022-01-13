@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 from core.boundingbox import BoundingBox
-# from core.stmove import StMove
 
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsView, QRubberBand, QGraphicsScene, QGraphicsLineItem
 from PyQt5.QtGui import QPainterPath, QPen, QColor, QPainterPathStroker, QMouseEvent
@@ -317,6 +316,13 @@ class MyGraphicsScene(QGraphicsScene):
         self.draw_wp_zero()
         self.update()
 
+    def draw_all(self, ui):
+        self.clear()
+        self.draw_shapes(ui.geometry)
+        # self.draw_operations(ui.operations)
+        self.draw_workpiece(ui.workpiece)
+
+
     def draw_shapes(self, geometry):
         pens = [QPen(QColor("blue")), QPen(QColor("red")), QPen(QColor("green"))]
         for idx, shape in enumerate(geometry.shapes):
@@ -324,3 +330,6 @@ class MyGraphicsScene(QGraphicsScene):
 
     def draw_operations(self, operations):
         pass
+
+    def draw_workpiece(self, workpiece):
+        workpiece.draw(self)
