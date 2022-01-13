@@ -10,7 +10,7 @@ import preprocess.dxfimport.importer as importer
 import core.tooltable as tooltable
 import core.globals as globals
 import gui.tools_tab as tools_tab
-
+import gui.operations_tab as operations_tab
 
 from PyQt5.QtWidgets import QMainWindow, QGraphicsView, QFileDialog, QApplication, QMessageBox
 from PyQt5.QtGui import QSurfaceFormat
@@ -52,9 +52,11 @@ class MainWindow(QMainWindow):
         self.connect_signals()
 
     def setup_graphics(self):
-
         # Tool table tab
         self.ToolsTab = tools_tab.ToolsTab(self.ui, self.tools)
+
+        # Operations tab
+        self.OperationTab = operations_tab.OperationsTab(self.ui, self.tools)
 
         # Canvas
         self.canvas_scene = gui.canvas.MyGraphicsScene()
@@ -62,22 +64,24 @@ class MainWindow(QMainWindow):
         self.canvas_view.setScene(self.canvas_scene)
 
 
-
-        # path = QPainterPath()
-        # pen = QPen()
-        # path.addRect(20,20,50,50)
-        # path.lineTo(0,0)
-        # path.lineTo(100,200)
-        # path.moveTo(200,400)
-        # path.lineTo(40,22)
-        # self.canvas_scene.addPath(path)
-
     def connect_signals(self):
         # File
         self.ui.actionOpen.triggered.connect(lambda: file_handler.open(self))
         # self.ui.actionImport.triggered.connect(lambda: file_handler.import_drawing(self))
         self.ui.actionImport.triggered.connect(self.open_file)
         self.ui.actionSave.triggered.connect(lambda: file_handler.saveProject(self))
+        self.ui.generate_paths_action.pressed.connect(self.generate_paths)
+        self.ui.save_gcode_action.pressed.connect(self.save_gcode)
+
+
+
+    def test(self):
+        print("TESTING")
+
+    def save_gcode(self):
+        pass
+    def generate_paths(self):
+        pass
 
     def open_file(self):
         # Read drawing file into self.DXF_file

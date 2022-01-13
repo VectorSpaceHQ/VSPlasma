@@ -1013,7 +1013,7 @@
       <number>1</number>
      </property>
      <item>
-      <widget class="QPushButton" name="generate_paths">
+      <widget class="QPushButton" name="generate_paths_action">
        <property name="maximumSize">
         <size>
          <width>150</width>
@@ -1026,7 +1026,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="save_gcode">
+      <widget class="QPushButton" name="save_gcode_action">
        <property name="maximumSize">
         <size>
          <width>150</width>

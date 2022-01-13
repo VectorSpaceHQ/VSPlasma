@@ -71,7 +71,6 @@ class Operation():
         """.format(self.name, self.nr, self.tool, self.contours)
         return output
 
-
     # rewrite optimizeTSP and put it here
     def generate_path(self):
         """

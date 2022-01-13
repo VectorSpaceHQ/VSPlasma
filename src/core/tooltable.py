@@ -45,6 +45,7 @@ class ToolTable(dict):
         self.tool_count = 0
 
         self.load_table()
+        print(self)
 
     def load_table(self):
         """
@@ -57,7 +58,7 @@ class ToolTable(dict):
                     for tool in tools.values():
                         new_tool = Tool()
                         new_tool.create_from_dict(tool)
-                        self.add_tool(new_tool)
+                        self.add_tool(tool=new_tool)
                 except yaml.YAMLError as exc:
                     print("EXCEPTION:", exc)
         else:
@@ -88,9 +89,12 @@ class ToolTable(dict):
     def add_tool(self, tool=None):
         if not tool:
             tool = Tool()
+        # Avoid duplicate names
         while tool.name in self.keys():
             tool.name += "1"
+
         self[tool.name] = tool
+
         self.tool_count += 1
 
     def remove_tool(self, tool_name):
@@ -124,7 +128,7 @@ class Tool():
         Standard method to print the object
         @return: A string
         """
-        string = ''
+        string = '\nTool Object:'
         for attr, value in self.__dict__.items():
             string += "\n" + str(attr) + ":    " + str(value)
         return string

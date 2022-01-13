@@ -10,7 +10,6 @@ class ToolsTab(QWidget):
         QWidget.__init__(self)
         self.ui = ui
         self.tools = tools
-        print(self.tools)
 
         self.tool_table_init()
 
@@ -25,16 +24,17 @@ class ToolsTab(QWidget):
 
         self.ui.tool_list_Widget.itemClicked.connect(self.load_active_tool)
         self.ui.tool_name_value.editingFinished.connect(self.update_active_tool)
-        self.ui.tool_number_value.textChanged.connect(self.update_active_tool)
-        self.ui.tool_diameter_value.textChanged.connect(self.update_active_tool)
-        self.ui.tool_default_feedrate_value.textChanged.connect(self.update_active_tool)
-        self.ui.tool_default_plungerate_value.textChanged.connect(self.update_active_tool)
-        self.ui.tool_pierce_delay_value.textChanged.connect(self.update_active_tool)
-        self.ui.tool_pierce_height_value.textChanged.connect(self.update_active_tool)
-        self.ui.tool_lead_in_value.textChanged.connect(self.update_active_tool)
+        self.ui.tool_number_value.editingFinished.connect(self.update_active_tool)
+        self.ui.tool_diameter_value.editingFinished.connect(self.update_active_tool)
+        self.ui.tool_default_feedrate_value.editingFinished.connect(self.update_active_tool)
+        self.ui.tool_default_plungerate_value.editingFinished.connect(self.update_active_tool)
+        self.ui.tool_pierce_delay_value.editingFinished.connect(self.update_active_tool)
+        self.ui.tool_pierce_height_value.editingFinished.connect(self.update_active_tool)
+        self.ui.tool_cut_height_value.editingFinished.connect(self.update_active_tool)
+        self.ui.tool_lead_in_value.editingFinished.connect(self.update_active_tool)
 
         for tool_name, tool in self.tools.items():
-            self.ui.tool_list_Widget.addItem("[T" + str(tool.number) + "]  " + tool_name)
+            self.ui.tool_list_Widget.addItem("[T" + str(tool.number) + "]  " + str(tool_name))
         self.ui.tool_list_Widget.setCurrentRow(0)
         self.load_active_tool()
 
@@ -72,6 +72,7 @@ class ToolsTab(QWidget):
         tool_plunge_rate = str(act_tool.plunge_rate)
         tool_pierce_delay = str(act_tool.pierce_delay)
         tool_pierce_height = str(act_tool.pierce_height)
+        tool_cut_height = str(act_tool.cut_height)
         tool_lead_in = str(act_tool.lead_in)
 
         self.ui.tool_name_value.setText(tool_name)
@@ -81,6 +82,7 @@ class ToolsTab(QWidget):
         self.ui.tool_pierce_height_value.setText(tool_pierce_height)
         self.ui.tool_default_feedrate_value.setText(tool_feedrate)
         self.ui.tool_default_plungerate_value.setText(tool_plunge_rate)
+        self.ui.tool_cut_height_value.setText(tool_cut_height)
         self.ui.tool_lead_in_value.setText(tool_lead_in)
 
     def update_active_tool(self):
@@ -93,12 +95,13 @@ class ToolsTab(QWidget):
 
         try:
             act_tool.number = int(self.ui.tool_number_value.text())
-            act_tool.diameter = float(self.ui.tool_diameter_value.text())
-            act_tool.feedrate = float(self.ui.tool_default_feedrate_value.text())
-            act_tool.plunge_rate = float(self.ui.tool_default_plungerate_value.text())
-            act_tool.pierce_delay = float(self.ui.tool_pierce_delay_value.text())
-            act_tool.pierce_height = float(self.ui.tool_pierce_height_value.text())
-            act_tool.lead_in = float(self.ui.tool_lead_in_value.text())
+            act_tool.diameter = _to_float_(self.ui.tool_diameter_value.text())
+            act_tool.feedrate = _to_float_(self.ui.tool_default_feedrate_value.text())
+            act_tool.plunge_rate = _to_float_(self.ui.tool_default_plungerate_value.text())
+            act_tool.pierce_delay = _to_float_(self.ui.tool_pierce_delay_value.text())
+            act_tool.pierce_height = _to_float_(self.ui.tool_pierce_height_value.text())
+            act_tool.cut_height = _to_float_(self.ui.tool_cut_height_value.text())
+            act_tool.lead_in = _to_float_(self.ui.tool_lead_in_value.text())
 
             # change tool name
             new_tool_name = self.ui.tool_name_value.text()
@@ -111,3 +114,10 @@ class ToolsTab(QWidget):
             print("update_active_tool exception ", e)
 
         self.tools.save_table()
+
+def _to_float_(text):
+    if text == '':
+        val = 0
+    else:
+        val = float(text)
+    return val
