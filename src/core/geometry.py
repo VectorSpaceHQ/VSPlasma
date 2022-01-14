@@ -271,3 +271,6 @@ class Element():
 
     def make_path(self):
         pass
+
+def initialize():
+    return Geometry()

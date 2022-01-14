@@ -84,14 +84,10 @@ class MyGraphicsView(CanvasBase):
         self.setTransformationAnchor(QGraphicsView.AnchorUnderMouse)
         self.setResizeAnchor(QGraphicsView.AnchorViewCenter)
 
-        # self.setDragMode(QGraphicsView.RubberBandDrag )
-        self.setDragMode(QGraphicsView.NoDrag)
-
         self.parent = parent
-        self.mppos = None
 
-        self.rubberBand = QRubberBand(QRubberBand.Rectangle, self)
-        self.prvRectRubberBand = QtCore.QRect()
+
+
 
     def tr(self, string_to_translate):
         """
@@ -159,29 +155,6 @@ class MyGraphicsView(CanvasBase):
         @purpose: Get the MouseMoveEvent and use it for the Rubberband Selection
         @param event: Event Parameters passed to function
         """
-        if self.mppos is not None:
-            Point = event.pos() - self.mppos
-            if Point.manhattanLength() > 3:
-                # print 'the mouse has moved more than 3 pixels since the oldPosition'
-                # print "Mouse Pointer is currently hovering at: ", event.pos()
-                rect = QtCore.QRect(self.mppos, event.pos())
-                '''
-                The following is needed because of PyQt5 doesn't like to switch from sign
-                 it will keep displaying last rectangle, i.e. you can end up will multiple rectangles
-                '''
-                if self.prvRectRubberBand.width() > 0 and not rect.width() > 0 or rect.width() == 0 or\
-                   self.prvRectRubberBand.height() > 0 and not rect.height() > 0 or rect.height() == 0:
-                    self.rubberBand.hide()
-                self.rubberBand.setGeometry(rect.normalized())
-                self.rubberBand.show()
-                self.prvRectRubberBand = rect
-
-        scpoint = self.mapToScene(event.pos())
-
-        # self.setStatusTip('X: %3.1f; Y: %3.1f' % (scpoint.x(), -scpoint.y()))
-        # works not as supposed to
-        self.setToolTip('X: %3.1f; Y: %3.1f' %(scpoint.x(), -scpoint.y()))
-
         super(MyGraphicsView, self).mouseMoveEvent(event)
 
     def autoscale(self):
@@ -222,7 +195,7 @@ class MyGraphicsScene(QGraphicsScene):
     MyGraphicsView controls the UI.
     MyGraphicsScene controls the canvas rendering.
     """
-    def __init__(self):
+    def __init__(self, workpiece=None, machine=None):
         QGraphicsScene.__init__(self)
 
         self.shapes = []
@@ -236,6 +209,10 @@ class MyGraphicsScene(QGraphicsScene):
         self.showDisabledPaths = False
 
         self.BB = BoundingBox()
+
+        self.draw_machine(machine)
+        self.draw_workpiece(workpiece)
+
 
     def tr(self, string_to_translate):
         """
@@ -259,14 +236,16 @@ class MyGraphicsScene(QGraphicsScene):
         self.draw_wp_zero()
         self.update()
 
-    def draw_all(self, ui):
-        self.clear()
-        self.draw_shapes(ui.geometry)
+    def draw_all(self, mw):
+        self.draw_machine(mw.machine)
+        self.draw_workpiece(mw.workpiece)
+        self.draw_shapes(mw.geometry)
         # self.draw_operations(ui.operations)
-        self.draw_workpiece(ui.workpiece)
-
 
     def draw_shapes(self, geometry):
+        if not geometry.shapes: # file not opened yet
+            return
+
         pens = [QPen(QColor("blue")), QPen(QColor("red")), QPen(QColor("green"))]
         for idx, shape in enumerate(geometry.shapes):
             shape.make_paint_path(self)
@@ -276,3 +255,6 @@ class MyGraphicsScene(QGraphicsScene):
 
     def draw_workpiece(self, workpiece):
         workpiece.draw(self)
+
+    def draw_machine(self, machine):
+        machine.draw(self)

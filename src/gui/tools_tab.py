@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import core.globals as g
+from core.utils import to_float
 
 from PyQt5.QtWidgets import QWidget
 
@@ -95,13 +96,13 @@ class ToolsTab(QWidget):
 
         try:
             act_tool.number = int(self.ui.tool_number_value.text())
-            act_tool.diameter = _to_float_(self.ui.tool_diameter_value.text())
-            act_tool.feedrate = _to_float_(self.ui.tool_default_feedrate_value.text())
-            act_tool.plunge_rate = _to_float_(self.ui.tool_default_plungerate_value.text())
-            act_tool.pierce_delay = _to_float_(self.ui.tool_pierce_delay_value.text())
-            act_tool.pierce_height = _to_float_(self.ui.tool_pierce_height_value.text())
-            act_tool.cut_height = _to_float_(self.ui.tool_cut_height_value.text())
-            act_tool.lead_in = _to_float_(self.ui.tool_lead_in_value.text())
+            act_tool.diameter = to_float(self.ui.tool_diameter_value.text())
+            act_tool.feedrate = to_float(self.ui.tool_default_feedrate_value.text())
+            act_tool.plunge_rate = to_float(self.ui.tool_default_plungerate_value.text())
+            act_tool.pierce_delay = to_float(self.ui.tool_pierce_delay_value.text())
+            act_tool.pierce_height = to_float(self.ui.tool_pierce_height_value.text())
+            act_tool.cut_height = to_float(self.ui.tool_cut_height_value.text())
+            act_tool.lead_in = to_float(self.ui.tool_lead_in_value.text())
 
             # change tool name
             new_tool_name = self.ui.tool_name_value.text()
@@ -114,10 +115,3 @@ class ToolsTab(QWidget):
             print("update_active_tool exception ", e)
 
         self.tools.save_table()
-
-def _to_float_(text):
-    if text == '':
-        val = 0
-    else:
-        val = float(text)
-    return val
