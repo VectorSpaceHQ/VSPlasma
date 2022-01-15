@@ -37,6 +37,8 @@ from core.point import Point
 from core.boundingbox import BoundingBox
 
 from PyQt5 import QtCore
+from PyQt5.QtGui import QPainterPath
+from PyQt5.QtWidgets import QGraphicsItem, QGraphicsLineItem, QGraphicsPathItem
 
 import logging
 logger = logging.getLogger("core.arcgeo")
@@ -335,9 +337,6 @@ class ArcGeo(object):
 
         path.moveTo(self.Ps.x, -self.Ps.y)
         path.arcTo(rect, start_angle, math.fabs(end_angle - start_angle)) # always draw clockwise
-
-    def draw_entity(self, canvas_scene, pen):
-        canvas_scene.addLine(self.Ps.x, self.Ps.y, self.Pe.x, self.Pe.y, pen)
 
     def reverse(self):
         """

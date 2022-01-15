@@ -246,9 +246,9 @@ class MyGraphicsScene(QGraphicsScene):
         if not geometry.shapes: # file not opened yet
             return
 
-        pens = [QPen(QColor("blue")), QPen(QColor("red")), QPen(QColor("green"))]
         for idx, shape in enumerate(geometry.shapes):
-            shape.make_paint_path(self)
+            shape.make_path_item(self)
+            # shape.paint_shape(self)
 
     def draw_operations(self, operations):
         pass

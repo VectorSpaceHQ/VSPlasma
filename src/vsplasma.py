@@ -26,11 +26,9 @@ logger = logging.getLogger()
 
 
 class MainWindow(QMainWindow):
-
     """
     Main Class
     """
-
     # Define a QT signal that is emitted when the configuration changes.
     # Connect to this signal if you need to know when the configuration has
     # changed.
@@ -80,12 +78,13 @@ class MainWindow(QMainWindow):
         # self.ui.actionImport.triggered.connect(lambda: file_handler.import_drawing(self))
         self.ui.actionImport.triggered.connect(self.open_file)
         self.ui.actionSave.triggered.connect(lambda: file_handler.saveProject(self))
-        self.ui.generate_paths_action.pressed.connect(self.generate_paths)
+        self.ui.generate_paths_action.pressed.connect(self.generate_operations)
         self.ui.save_gcode_action.pressed.connect(self.save_gcode)
 
     def save_gcode(self):
         pass
-    def generate_paths(self):
+
+    def generate_operations(self):
         pass
 
     def open_file(self):
@@ -113,6 +112,7 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
 
     window = MainWindow(app)
+    window.setWindowTitle('VSPlasma')
 
     window.show()
     sys.exit(app.exec_())

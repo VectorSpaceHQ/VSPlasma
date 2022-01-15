@@ -34,6 +34,7 @@ from core.boundingbox import BoundingBox
 #from core.arcgeo import ArcGeo
 
 from PyQt5.QtGui import QPainterPath
+from PyQt5.QtWidgets import QGraphicsItem, QGraphicsLineItem
 
 import logging
 logger = logging.getLogger("core.linegeo")
@@ -157,8 +158,13 @@ class LineGeo(object):
 
         self.abs_geo = LineGeo(Ps=Ps, Pe=Pe)
 
-    def draw_entity(self, canvas_scene, pen):
-        canvas_scene.addLine(self.Ps.x, self.Ps.y, self.Pe.x, self.Pe.y, pen)
+    def draw_entity(self, pen):
+        line = QGraphicsLineItem(self.Ps.x, self.Ps.y, self.Pe.x, self.Pe.y)
+        line.setPen(pen)
+        line.setFlag(QGraphicsItem.ItemIsMovable)
+        line.setFlag(QGraphicsItem.ItemIsSelectable)
+
+        self.graphics_item = line
 
     def make_path(self, path):
         path.moveTo(self.Ps.x, self.Ps.y)

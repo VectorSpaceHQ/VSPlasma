@@ -6,6 +6,7 @@
 
 import core.point as point
 from PyQt5.QtGui import QPainterPath, QPen, QColor
+from PyQt5.QtWidgets import QGraphicsItem, QGraphicsPathItem
 
 
 class Geometry():
@@ -163,6 +164,7 @@ class Shape():
         self.end_point = None
         self.BB = None
         self.geos = Geos(geos)
+        self.pathItem = QGraphicsPathItem()
         # self.elements = Elements(geos) # this will eventually replace Geos
 
         # self.make_paint_path()
@@ -217,38 +219,33 @@ class Shape():
         # else:
         #     return self.geos.abs_el(-1).get_start_end_points(False, angles)
 
-    def make_paint_path(self, canvas_scene):
+    def make_path_item(self, canvas_scene):
         """
         Render shape with path technique. More flexible support of shapes found
         in vector formats but has to be done in correct order.
         """
         pen = QPen()
-        if self.selected:
-            pen.setColor(QColor('blue'))
-        else:
-            pen.setColor(QColor('black'))
-
-        self.path = QPainterPath()
+        path = QPainterPath()
+        pathItem = myQGraphicsPathItem()
 
         if not self.disabled:
             for geo in self.geos:
-                geo.make_path(self.path)
+                geo.make_path(path)
 
-        canvas_scene.addPath(self.path, pen)
+        pathItem.setPath(path)
+        pathItem.setFlag(QGraphicsItem.ItemIsMovable)
+        pathItem.setFlag(QGraphicsItem.ItemIsSelectable)
 
-    def paint_shape(self, canvas_scene):
-        """
-        Render shape with drawing technique
-        """
-        pen = QPen()
-        if self.selected:
+        if self.pathItem.isSelected():
             pen.setColor(QColor('blue'))
+            print("selected")
         else:
             pen.setColor(QColor('black'))
+            print("NOT selected")
+        self.pathItem.setPen(pen)
 
-        if not self.disabled:
-            for geo in self.geos:
-                geo.draw_entity(canvas_scene, pen)
+        self.pathItem = pathItem
+        canvas_scene.addItem(self.pathItem)
 
 
 class Elements():
@@ -271,6 +268,19 @@ class Element():
 
     def make_path(self):
         pass
+
+
+class myQGraphicsPathItem(QGraphicsPathItem):
+    def mouseReleaseEvent(self,event):
+        print("RELEASE")
+    def mouseDoubleClickEvent(self, event):
+        if self.isSelected():
+            pen = QPen(QColor('blue'))
+            self.setPen(pen)
+        else:
+            pen = QPen(QColor('black'))
+            self.setPen(pen)
+
 
 def initialize():
     return Geometry()
