@@ -14,6 +14,7 @@ import gui.operations_tab as operations_tab
 import core.workpiece as workpiece
 import core.machine as machine
 import core.geometry as geometry
+import core.config as config
 import gui.setup_tab as setup_tab
 
 from PyQt5.QtWidgets import QMainWindow, QGraphicsView, QFileDialog, QApplication, QMessageBox
@@ -49,6 +50,7 @@ class MainWindow(QMainWindow):
         self.ui.setupUi(self)
         self.showMaximized()
 
+        self.config = config.Config()
         self.tools = tooltable.ToolTable()
         self.machine = machine.Machine()
         self.workpiece = workpiece.Workpiece(machine=self.machine)

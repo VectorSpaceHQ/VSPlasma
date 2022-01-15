@@ -907,7 +907,7 @@ class BlocksClass:
         return s
 
 
-def make_geometry_from_dxf(ui):
+def make_geometry_from_dxf(mw):
     """
     Takes a ReadDXF object and translates into Parts, Layers, and Shapes
     Entities -> parts
@@ -915,67 +915,30 @@ def make_geometry_from_dxf(ui):
     Layers -> groups
     Geo -> shapes
     """
-    dxfobj = ui.DXF_file
+    dxfobj = mw.DXF_file
 
     # Initialize geometry components
     shapes = geometry.Shapes()
     groups = geometry.Groups()
     parts = geometry.Parts()
 
-    # Initialize the part. 1 drawing = 1 part
     filename = dxfobj.filename
-    p = geometry.Part(name=filename, collector=parts)
+    part = geometry.Part(name=filename, collector=parts)
 
-    # Create all Group objects
+    # Connect layer names to numbers
+    Layers = {}
     for idx, l in enumerate(dxfobj.layers):
-        g = geometry.Group(part=p, nr=idx, name=l.name, collector=groups)
+        Layers[l.Nr] = l.name
 
-    # Create Shape objects found in each Group
-    for e in dxfobj.entities.geo:
-        # print(e) # this is the geoent
-        # print(e.geo) # this is the arcgeo. I don't fully understand
-        # connect geo to group
-        layer_nr = e.Layer_Nr
-        g = None
-        for group in groups.values():
-            if group.nr == layer_nr:
-                g = group
-
-    for idx, contour in enumerate(dxfobj.entities.cont):
-        geo_list = []
-        for geo_a, geo_b in contour.order:
-            j = 0
-            while j < len(dxfobj.entities.geo[geo_a].geo):
-                line_geo_a = dxfobj.entities.geo[geo_a].geo[j]
-                line_geo_b = dxfobj.entities.geo[geo_b].geo[j]
-                geo_list.append(line_geo_a)
-                geo_list.append(line_geo_b)
-                layer_nr = dxfobj.entities.geo[geo_a].Layer_Nr
-                j += 1
-                for group in groups.values():
-                    if group.nr == layer_nr:
-                        g = group
-                        break
-
-
-        geo_set = set(geo_list) # remove duplicates
-        geo_list = list(geo_set)
-        shape = geometry.Shape(nr=idx, group=g, geos=geo_list, collector=shapes)
+    for idx, geo in enumerate(dxfobj.entities.geo):
+        layer_nr = geo.Layer_Nr
+        layer_name = Layers[layer_nr]
+        group = geometry.Group(part=part, name=layer_name, nr=layer_nr, collector=groups)
+        elem_list = [e for e in geo.geo]
+        shape = geometry.Shape(nr=idx, group=group, geos=elem_list,collector=shapes)
 
     # Add objects to main ui container
-    ui.geometry = geometry.Geometry(Parts=parts, Groups=groups, Shapes=shapes)
-
+    mw.geometry = geometry.Geometry(Parts=parts, Groups=groups, Shapes=shapes)
     print(parts)
     print(groups)
     print(shapes)
-    # print("report:\n\n")
-    # print(parts)
-    # print(parts[filename])
-    # print(parts[filename].groups)
-    # print("group names",groups.names)
-    # print(groups[groups.names[0]])
-    # print("first group name:", groups[groups.names[0]].name)
-    # print("num contours:", groups[groups.names[0]].num_contours)
-    # print(groups[groups.names[0]].contours)
-    # print(shapes)
-    # print(len(shapes[0].geos))

@@ -154,7 +154,7 @@ class Shape():
     """
     One or more geometric shapes: Line, Arc, etc.
     """
-    def __init__(self, nr=-1, group=None, closed=True, collector=None, geos=[]):
+    def __init__(self, nr=-1, group=None, closed=True, collector=None, geos=[], elements=[]):
         self.selected = False
         self.disabled = False
         self.locked = False
@@ -165,7 +165,7 @@ class Shape():
         self.BB = None
         self.geos = Geos(geos)
         self.pathItem = QGraphicsPathItem()
-        # self.elements = Elements(geos) # this will eventually replace Geos
+        self.elements = Elements(elements)  # this will eventually replace Geos
 
         # self.make_paint_path()
 
@@ -249,7 +249,7 @@ class Shape():
 
 
 class Elements():
-    def __init__(self):
+    def __init__(self, element):
         pass
 
 

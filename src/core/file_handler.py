@@ -4,6 +4,7 @@ import os
 import logging
 import core.globals as g
 from preprocess.dxfimport.importer import ReadDXF
+import core.config as config
 
 from PyQt5.QtWidgets import QMainWindow, QGraphicsView, QFileDialog, QApplication, QMessageBox
 from PyQt5.QtGui import QSurfaceFormat
@@ -30,49 +31,49 @@ def open(ui):
     ui.app.processEvents()
     ui.unsetCursor()
 
-def import_drawing(ui, plot=True):
+def import_drawing(mw, plot=True):
     """
     Loads dxf and other drawings.  Also calls the command to
     make the plot.
     @param plot: if it should plot
     """
     # debuggging
-    ui.filename = "../tests/circle-layers.dxf"
-    # ui.filename = "../tests/1in-box.dxf"
-    # ui.filename = "../tests/two-splines.dxf"
+    mw.filename = "../tests/circle-layers.dxf"
+    # mw.filename = "../tests/1in-box.dxf"
+    # mw.filename = "../tests/two-splines.dxf"
 
-    # ui.filename, _ = getOpenFileName(ui,
+    # mw.filename, _ = getOpenFileName(mw,
     #                                  "Import Drawing File",
     #                                  g.open_path,
     #                                  "Drawing Files (*.dxf)")
-    # if not QtCore.QFile.exists(ui.filename):
-    #     logger.info("Cannot locate file: %s" % ui.filename)
-    #     if not ui.filename:
+    # if not QtCore.QFile.exists(mw.filename):
+    #     logger.info("Cannot locate file: %s" % mw.filename)
+    #     if not mw.filename:
     #         return False
 
-    ui.setCursor(QtCore.Qt.WaitCursor)
-    ui.setWindowTitle("VSPlasma - [%s]" % ui.filename)
-    ui.canvas_view.resetAll()
-    ui.app.processEvents()
+    mw.setCursor(QtCore.Qt.WaitCursor)
+    mw.setWindowTitle("VSPlasma - [%s]" % mw.filename)
+    mw.canvas_view.resetAll()
+    mw.app.processEvents()
 
-    (name, ext) = os.path.splitext(ui.filename)
+    (name, ext) = os.path.splitext(mw.filename)
 
-    ui.DXF_file = ReadDXF(ui.filename)
+    mw.DXF_file = ReadDXF(mw.filename)
 
     # Output the information in the text window
-    logger.info(ui.tr('Loaded layers: %s') % len(ui.DXF_file.layers))
-    logger.info(ui.tr('Loaded blocks: %s') % len(ui.DXF_file.blocks.Entities))
-    for i in range(len(ui.DXF_file.blocks.Entities)):
-        layers = ui.DXF_file.blocks.Entities[i].get_used_layers()
-        logger.info(ui.tr('Block %i includes %i Geometries, reduced to %i Contours, used layers: %s')
-                    % (i, len(ui.DXF_file.blocks.Entities[i].geo), len(ui.DXF_file.blocks.Entities[i].cont), layers))
-    layers = ui.DXF_file.entities.get_used_layers()
-    insert_nr = ui.DXF_file.entities.get_insert_nr()
-    logger.info(ui.tr('Loaded %i entity geometries; reduced to %i contours; used layers: %s; number of inserts %i')
-                % (len(ui.DXF_file.entities.geo), len(ui.DXF_file.entities.cont), layers, insert_nr))
+    logger.info(mw.tr('Loaded layers: %s') % len(mw.DXF_file.layers))
+    logger.info(mw.tr('Loaded blocks: %s') % len(mw.DXF_file.blocks.Entities))
+    for i in range(len(mw.DXF_file.blocks.Entities)):
+        layers = mw.DXF_file.blocks.Entities[i].get_used_layers()
+        logger.info(mw.tr('Block %i includes %i Geometries, reduced to %i Contours, used layers: %s')
+                    % (i, len(mw.DXF_file.blocks.Entities[i].geo), len(mw.DXF_file.blocks.Entities[i].cont), layers))
+    layers = mw.DXF_file.entities.get_used_layers()
+    insert_nr = mw.DXF_file.entities.get_insert_nr()
+    logger.info(mw.tr('Loaded %i entity geometries; reduced to %i contours; used layers: %s; number of inserts %i')
+                % (len(mw.DXF_file.entities.geo), len(mw.DXF_file.entities.cont), layers, insert_nr))
 
-    ui.units = ui.DXF_file.units
-    ui.unsetCursor()
+    mw.config.units = mw.DXF_file.units
+    mw.unsetCursor()
 
 
 
