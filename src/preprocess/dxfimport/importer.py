@@ -25,6 +25,7 @@
 
 from __future__ import absolute_import
 
+import os
 from copy import deepcopy, copy
 import logging
 import core.globals as g
@@ -922,8 +923,9 @@ def make_geometry_from_dxf(mw):
     groups = geometry.Groups()
     parts = geometry.Parts()
 
-    filename = dxfobj.filename
-    part = geometry.Part(name=filename, collector=parts)
+    filename = os.path.basename(dxfobj.filename)
+    (part_name, ext) = os.path.splitext(filename)
+    part = geometry.Part(name=part_name, collector=parts)
 
     # Connect layer names to numbers
     Layers = {}

@@ -101,9 +101,9 @@ class ToolTable(dict):
         self.tool_count -= 1
 
     def change_tool_name(self, oldname, newname):
-        self[newname] = self[oldname]
+        self[str(newname)] = self[oldname]
         del self[oldname]
-        self[newname].name = newname
+        self[str(newname)].name = newname
         self.save_table()
 
     def get_active_tool(self):
