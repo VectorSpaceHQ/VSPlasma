@@ -6,7 +6,7 @@
 
 import core.point as point
 from PyQt5.QtGui import QPainterPath, QPen, QColor
-from PyQt5.QtWidgets import QGraphicsItem, QGraphicsPathItem
+from PyQt5.QtWidgets import QGraphicsItem, QGraphicsPathItem, QStyle
 
 
 class Geometry():
@@ -233,17 +233,6 @@ class Shape():
                 geo.make_path(path)
 
         pathItem.setPath(path)
-        pathItem.setFlag(QGraphicsItem.ItemIsMovable)
-        pathItem.setFlag(QGraphicsItem.ItemIsSelectable)
-
-        if self.pathItem.isSelected():
-            pen.setColor(QColor('blue'))
-            print("selected")
-        else:
-            pen.setColor(QColor('black'))
-            print("NOT selected")
-        self.pathItem.setPen(pen)
-
         self.pathItem = pathItem
         canvas_scene.addItem(self.pathItem)
 
@@ -271,15 +260,32 @@ class Element():
 
 
 class myQGraphicsPathItem(QGraphicsPathItem):
-    def mouseReleaseEvent(self,event):
-        print("RELEASE")
-    def mouseDoubleClickEvent(self, event):
+    def __init__(self):
+        super().__init__()
+        # self.setFlag(QGraphicsItem.ItemIsMovable)
+        self.setFlag(QGraphicsItem.ItemIsSelectable)
+
+    def mousePressEvent(self, e):
+        if self.isSelected():
+            self.setSelected(False)
+        else:
+            self.setSelected(True)
+
         if self.isSelected():
             pen = QPen(QColor('blue'))
-            self.setPen(pen)
         else:
             pen = QPen(QColor('black'))
-            self.setPen(pen)
+        self.setPen(pen)
+
+    def mouseDoubleClickEvent(self, e):
+        print("geometry.py: double click", e)
+
+    def paint(self, painter, option, a):
+        """
+        Hide the dashed line on selected items
+        """
+        option.state = QStyle.State_None
+        return super(myQGraphicsPathItem, self).paint(painter,option)
 
 
 def initialize():

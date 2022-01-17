@@ -32,7 +32,6 @@ class CanvasBase(QGraphicsView):
 
         if type (event) == QMouseEvent:
             buttons = event.buttons()
-            print("CanvasBase QMouseEvent")
         else:
             buttons = QApplication.mouseButtons()
 
@@ -86,9 +85,6 @@ class MyGraphicsView(CanvasBase):
 
         self.parent = parent
 
-
-
-
     def tr(self, string_to_translate):
         """
         Translate a string using the QCoreApplication translation framework
@@ -115,19 +111,21 @@ class MyGraphicsView(CanvasBase):
         scale = (1000 + delta) / 1000.0
         self.scale(scale, scale)
 
-    def mousePressEvent(self, event):
-        """
-        Right Mouse click shall have no function, Therefore pass only left
-        click event
-        @purpose: Change inherited mousePressEvent
-        @param event: Event Parameters passed to function
-        """
-        if event.button() == QtCore.Qt.MidButton:
-            self.setDragMode(QGraphicsView.ScrollHandDrag)
-            # self.original_event = event
-            # handmade_event = QMouseEvent(QtCore.QEvent.MouseButtonPress,QtCore.QPointF(event.pos()),QtCore.Qt.LeftButton,event.buttons(),QtCore.Qt.KeyboardModifiers())
-            # self.mousePressEvent(handmade_event)
-            # super(MyGraphicsView, self).mousePressEvent(event)
+    # def mousePressEvent(self, event):
+    #     """
+    #     Right Mouse click shall have no function, Therefore pass only left
+    #     click event
+    #     @purpose: Change inherited mousePressEvent
+    #     @param event: Event Parameters passed to function
+    #     """
+    #     event.ignore()
+    #     print("mousePressEvent VIEW", event)
+    #     if event.button() == QtCore.Qt.MidButton:
+    #         self.setDragMode(QGraphicsView.ScrollHandDrag)
+    #         # self.original_event = event
+    #         # handmade_event = QMouseEvent(QtCore.QEvent.MouseButtonPress,QtCore.QPointF(event.pos()),QtCore.Qt.LeftButton,event.buttons(),QtCore.Qt.KeyboardModifiers())
+    #         # self.mousePressEvent(handmade_event)
+    #         # super(MyGraphicsView, self).mousePressEvent(event)
 
 
     def mouseReleaseEvent(self, event):
@@ -155,7 +153,13 @@ class MyGraphicsView(CanvasBase):
         @purpose: Get the MouseMoveEvent and use it for the Rubberband Selection
         @param event: Event Parameters passed to function
         """
+        # How can this set a label in the main window?
         super(MyGraphicsView, self).mouseMoveEvent(event)
+
+        # print(event.pos())
+        # print(self.obj_pos_label.text())
+        # print(self.parent)
+        # print(self.parent.ui)
 
     def autoscale(self):
         """

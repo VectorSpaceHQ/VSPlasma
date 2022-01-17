@@ -45,7 +45,6 @@ class ToolTable(dict):
         self.tool_count = 0
 
         self.load_table()
-        print(self)
 
     def load_table(self):
         """
