@@ -68,13 +68,13 @@ class MainWindow(QMainWindow):
         self.canvas_view.setScene(self.canvas_scene)
 
         # Setup Tab
-        self.SetupTab = setup_tab.SetupTab(self)
+        self.SetupTab = setup_tab.SetupTab(self, self.operations)
 
         # Tool table tab
         self.ToolsTab = tools_tab.ToolsTab(self.ui, self.tools)
 
         # Operations tab
-        self.OperationTab = operations_tab.OperationsTab(self.ui, self.tools)
+        self.OperationTab = operations_tab.OperationsTab(self.ui, self.tools, self.geometry)
 
     def connect_signals(self):
         # File

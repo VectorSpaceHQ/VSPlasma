@@ -98,6 +98,8 @@ class Part(dict):
         self.active = False
         self.base_x = 0
         self.base_y = 0
+        self.x0 = 0
+        self.y0 = 0
         self.base_point = point.Point(self.base_x, self.base_y)
         self.scale = 1
         self.angle = 0
@@ -231,7 +233,8 @@ class Shape():
         Render shape with path technique. More flexible support of shapes found
         in vector formats but has to be done in correct order.
         """
-        pen = QPen()
+        # pen = QPen()
+        pen = QPen(QColor('black'), 0.1)
         path = QPainterPath()
         pathItem = myQGraphicsPathItem()
 
@@ -279,9 +282,9 @@ class myQGraphicsPathItem(QGraphicsPathItem):
             self.setSelected(True)
 
         if self.isSelected():
-            pen = QPen(QColor('blue'))
+            pen = QPen(QColor('blue'), 0.5)
         else:
-            pen = QPen(QColor('black'))
+            pen = QPen(QColor('black'), 0.1)
         self.setPen(pen)
 
     def mouseDoubleClickEvent(self, e):

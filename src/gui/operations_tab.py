@@ -11,13 +11,14 @@ class OperationsTab(QWidget):
     Creates GUI behavior of Operations Tab.
     ui: the GUI
     """
-    def __init__(self, ui, tools):
+    def __init__(self, ui, tools, geometry):
         QWidget.__init__(self)
         self.ui = ui
         self.tools = tools
+        self.geometry = geometry
         self.active_shapes = []
-        self.layer_item_model = None
-        self.layers_list = None
+        self.group_item_model = None
+        self.groups_list = None
         self.op = None
 
         self.black_palette = QPalette()
@@ -27,7 +28,7 @@ class OperationsTab(QWidget):
         self.init_signals_and_slots()
         self.init_operation_values()
         self.load_tools()
-        self.load_shapes()
+        self.load_geometry()
 
     def load_tools(self):
         """
@@ -37,11 +38,23 @@ class OperationsTab(QWidget):
         for tool in self.tools.values():
             tool_combo_box.addItem(tool.name)
 
-    def load_shapes(self):
+    def load_geometry(self):
         """
         Load all active shapes from the Entities tab.
         """
-        pass
+        if self.geometry.parts is None:
+            return
+
+        for part in self.geometry.parts:
+            if part.active:
+                # show part
+                for group in part.groups:
+                    if group.active:
+                        # show group
+                        for shape in group.shapes:
+                            if shape.active:
+                                # show shape
+                                pass
 
     def init_signals_and_slots(self):
         # self.ui.layers_shapes_treeView.setModel(self.layer_item_model)

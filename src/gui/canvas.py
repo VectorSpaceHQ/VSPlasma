@@ -3,8 +3,9 @@
 from core.boundingbox import BoundingBox
 
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsView, QRubberBand, QGraphicsScene, QGraphicsLineItem
-from PyQt5.QtGui import QPainterPath, QPen, QColor, QPainterPathStroker, QMouseEvent
+from PyQt5.QtGui import QPainterPath, QPen, QColor, QPainterPathStroker, QMouseEvent, QBrush
 from PyQt5 import QtCore
+from PyQt5.QtCore import QRectF
 
 
 def Canvas(parent=None):
@@ -244,7 +245,7 @@ class MyGraphicsScene(QGraphicsScene):
         self.draw_machine(mw.machine)
         self.draw_workpiece(mw.workpiece)
         self.draw_shapes(mw.geometry)
-        # self.draw_operations(ui.operations)
+        self.draw_operations(mw.operations)
 
     def draw_shapes(self, geometry):
         if not geometry.shapes: # file not opened yet
@@ -255,7 +256,11 @@ class MyGraphicsScene(QGraphicsScene):
             # shape.paint_shape(self)
 
     def draw_operations(self, operations):
-        pass
+        # pen = QPen(QColor("green"))
+        # brush = QBrush(QColor(255,0,0, 50))
+        # rect = QRectF(operations.x0, operations.y0, 2, -2)
+        # self.addRect(rect, pen, brush)
+        operations.draw_origin(self)
 
     def draw_workpiece(self, workpiece):
         workpiece.draw(self)

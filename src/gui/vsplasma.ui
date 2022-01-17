@@ -45,7 +45,7 @@
      <bool>false</bool>
     </property>
     <property name="currentIndex">
-     <number>3</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="setup_tab">
      <attribute name="title">
@@ -171,6 +171,119 @@
       <property name="text">
        <string>Workpiece</string>
       </property>
+     </widget>
+     <widget class="QComboBox" name="origin_relative_comboBox">
+      <property name="geometry">
+       <rect>
+        <x>185</x>
+        <y>190</y>
+        <width>111</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <item>
+       <property name="text">
+        <string>Part</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Workpiece</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Machine</string>
+       </property>
+      </item>
+     </widget>
+     <widget class="QLabel" name="startAtXLabel_6">
+      <property name="geometry">
+       <rect>
+        <x>60</x>
+        <y>190</y>
+        <width>137</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Origin relative to:</string>
+      </property>
+     </widget>
+     <widget class="QWidget" name="">
+      <property name="geometry">
+       <rect>
+        <x>320</x>
+        <y>190</y>
+        <width>56</width>
+        <height>59</height>
+       </rect>
+      </property>
+      <layout class="QGridLayout" name="gridLayout">
+       <item row="0" column="0">
+        <widget class="QRadioButton" name="top_left_Button">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QRadioButton" name="top_center_Button">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="2">
+        <widget class="QRadioButton" name="top_right_Button">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QRadioButton" name="center_left_Button">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QRadioButton" name="center_Button">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="2">
+        <widget class="QRadioButton" name="center_right_Button">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QRadioButton" name="bot_left_Button">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="QRadioButton" name="bot_center_Button">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="2">
+        <widget class="QRadioButton" name="bot_right_Button">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </widget>
     </widget>
     <widget class="QWidget" name="entities_tab">

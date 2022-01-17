@@ -1,4 +1,8 @@
 # -*- coding: utf-8 -*-
+from PyQt5.QtGui import QPainterPath, QPen, QColor, QPainterPathStroker, QMouseEvent, QBrush
+from PyQt5.QtCore import QRectF
+from PyQt5.QtWidgets import QGraphicsItem
+from PyQt5 import QtCore, QtWidgets
 
 
 class Operations(list):
@@ -6,6 +10,9 @@ class Operations(list):
     A list of Operation objects.
     """
     def __init__(self):
+        self.rect = QtWidgets.QGraphicsRectItem()
+        self.x0 = 0
+        self.y0 = 0
         self.count = len(self)
 
     def __str__(self):
@@ -47,6 +54,20 @@ class Operations(list):
         Generate Paths for each operation
         """
         pass
+
+    def draw_origin(self, canvas):
+        try:
+            canvas.removeItem(self.rect)
+        except Exception as e:
+            print(e)
+
+        pen = QPen(QColor("green"))
+        brush = QBrush(QColor(255,0,0, 50))
+        rect = QRectF(self.x0-1, self.y0-1, 2, 2)
+        rect_item = QtWidgets.QGraphicsRectItem(rect)
+        rect_item.setPen(pen)
+        self.rect = rect_item
+        canvas.addItem(self.rect)
 
 
 class Operation(object):
