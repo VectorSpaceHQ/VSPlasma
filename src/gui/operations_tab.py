@@ -33,7 +33,7 @@ class OperationsTab(QWidget):
         """
         Load all tools from the Tools tab
         """
-        tool_combo_box = self.ui.operations_tab_tool_comboBox
+        tool_combo_box = self.ui.op_tab_tool_comboBox
         for tool in self.tools.values():
             tool_combo_box.addItem(tool.name)
 
@@ -50,9 +50,9 @@ class OperationsTab(QWidget):
         self.ui.save_operation_pushButton.clicked.connect(self.save_operation)
         self.ui.delete_operation_pushButton.clicked.connect(self.delete_operation)
         self.ui.operations_listView.doubleClicked.connect(self.load_operation)
-        self.ui.operations_tab_tool_comboBox.currentIndexChanged.connect(self.load_default_operations)
+        self.ui.op_tab_tool_comboBox.currentIndexChanged.connect(self.load_default_operations)
 
-        # self.ui.tool_name_value.editingFinished.connect(self.update_active_tool)
+        # self.ui.op_tab_tool_comboBox.currentIndexChanged.connect(self.update_active_tool)
         self.ui.op_feedrate_lineEdit.editingFinished.connect(self.update_active_operation)
         self.ui.op_plunge_rate_lineEdit.editingFinished.connect(self.update_active_operation)
         self.ui.op_pierce_delay_lineEdit.editingFinished.connect(self.update_active_operation)
@@ -65,7 +65,7 @@ class OperationsTab(QWidget):
         Load default values from the selected tool.
         Default values load grey.
         """
-        tool_name = self.ui.operations_tab_tool_comboBox.currentText()
+        tool_name = self.ui.op_tab_tool_comboBox.currentText()
         if tool_name:
             self.active_tool = self.tools[tool_name]
         else:
@@ -114,6 +114,9 @@ class OperationsTab(QWidget):
 
         if self.active_shapes and self.active_tool:
             self.op = Operation(self.active_shapes, self.active_tool)
+
+    def update_active_tool(self):
+        print(self.tool.name)
 
     def update_active_operation(self):
         """

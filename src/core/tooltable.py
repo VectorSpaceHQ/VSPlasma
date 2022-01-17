@@ -106,10 +106,16 @@ class ToolTable(dict):
         self[newname].name = newname
         self.save_table()
 
+    def get_active_tool(self):
+        for tool_name, tool_obj in self.items():
+            if tool_obj.active:
+                return tool_obj
+
 
 class Tool():
     def __init__(self):
         self.tool_type = 'plasma'
+        self.active = False
         self.name = 'default'
         self.number = int(0)
         self.diameter = float(1.0)
@@ -142,3 +148,9 @@ class Tool():
                 setattr(self, attr, d[attr])
             except Exception as e:
                 print("Error:", e)
+
+    def toggle_active(self):
+        if self.active:
+            self.active = False
+        else:
+            self.active = True

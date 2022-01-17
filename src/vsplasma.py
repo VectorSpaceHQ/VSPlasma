@@ -15,11 +15,12 @@ import core.workpiece as workpiece
 import core.machine as machine
 import core.geometry as geometry
 import core.config as config
+import core.operation as operation
 import gui.setup_tab as setup_tab
 
 from PyQt5.QtWidgets import QMainWindow, QGraphicsView, QFileDialog, QApplication, QMessageBox
 from PyQt5.QtGui import QSurfaceFormat
-from PyQt5.QtGui import QPainterPath, QBrush, QPen
+from PyQt5.QtGui import QIcon, QPainterPath, QBrush, QPen
 from PyQt5 import QtCore
 
 logger = logging.getLogger()
@@ -53,6 +54,7 @@ class MainWindow(QMainWindow):
         self.config = config.Config()
         self.tools = tooltable.ToolTable()
         self.machine = machine.Machine()
+        self.operations = operation.Operations()
         self.workpiece = workpiece.Workpiece(machine=self.machine)
         self.geometry = geometry.initialize()
         self.setup_graphics()
@@ -87,7 +89,11 @@ class MainWindow(QMainWindow):
         pass
 
     def generate_operations(self):
-        pass
+        selected_shapes = self.geometry.shapes.get_selected()
+        active_tool = self.tools.get_active_tool()
+        op = operation.Operation(selected_shapes, active_tool, parent=self.operations)
+        # self.operations.add(op)
+        # print(self.operations)
 
     def open_file(self):
         # Read drawing file into self.DXF_file
@@ -115,6 +121,7 @@ if __name__ == "__main__":
 
     window = MainWindow(app)
     window.setWindowTitle('VSPlasma')
+    window.setWindowIcon(QIcon('./images/vsp_icon.png'))
 
     window.show()
     sys.exit(app.exec_())

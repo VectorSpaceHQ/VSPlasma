@@ -83,6 +83,13 @@ class Shapes(list):
             self.append(contour)
             self.count += 1
 
+    def get_selected(self):
+        selected_shapes = []
+        for shape in self:
+            if shape.selected:
+                selected_shapes.append(shape)
+        return selected_shapes
+
 
 class Part(dict):
     def __init__(self, name=None, collector=None):

@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import globals.globals as g
-import postprocessing.postprocessor as postprocessor
 
 class Operations(list):
     """
@@ -13,13 +11,18 @@ class Operations(list):
     def __str__(self):
         line = "Operations:\n"
         for op in self:
-            line += op.nr + "\n"
+            line += str(op.name) + "\n"
+            line += str(op.nr) + "\n"
         return line
 
     def add(self, new_operation):
         """
         Add an Operation() object to the Operations list.
         """
+        if new_operation is None:
+            print("add failed")
+            return
+
         # check if this operation already exists
         for existing_op in self:
             if ((new_operation.shapes == existing_op.shapes) and
@@ -39,13 +42,19 @@ class Operations(list):
         for idx, op in enumerate(self):
             op.nr = idx + 1
 
+    def generate_paths(self):
+        """
+        Generate Paths for each operation
+        """
+        pass
 
-class Operation():
+
+class Operation(object):
     """
-    An operation assigns tool parameters to one or more contours.
+    An operation assigns tool parameters to one or more shapes.
     """
-    def __init__(self, Contours, Tool, nr=-1):
-        self.contours = Contours
+    def __init__(self, Shapes, Tool, nr=-1, parent=None):
+        self.shapes = Shapes
         self.tool = Tool
         self.name = self.tool.name
         self.nr = nr
@@ -54,10 +63,18 @@ class Operation():
         self.selected = False
         self.disabled = False
         self.locked = False
+        self.parent = parent
 
         self.stmove = None
         self.starrow = None
         self.enarrow = None
+
+    def __new__(cls, Shapes, Tool, nr=-1, parent=None):
+        if not Tool or not Shapes:
+            print("Operation could not be made")
+        else:
+            print("Operation made")
+            return object.__new__(cls)
 
     def __del__(self):
         pass
@@ -67,17 +84,23 @@ class Operation():
         Name: {}
         Number: {}
         Tool: {}
-        Contours: {}
+        Shapes: {}
         """.format(self.name, self.nr, self.tool, self.contours)
         return output
 
     # rewrite optimizeTSP and put it here
     def generate_path(self):
         """
-        Find optimum path along contours.
+        Find optimum path along shapes.
         Return list of geometries in optimum order
         """
         # path_creation.optimizeTSP()
+        pass
 
-        starting_order = self.contours
-        self.path = []
+    def write_gcode(self):
+        # each shape is drawn of geos, those geos have direct Gcode translations
+        gcode = ''
+        for shape in self.shapes:
+            for geo in shape.geos:
+                gcode += geo.Write_GCode()
+        print(gcode)
