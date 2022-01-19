@@ -4,7 +4,7 @@ from core.boundingbox import BoundingBox
 
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsView, QRubberBand, QGraphicsScene, QGraphicsLineItem
 from PyQt5.QtGui import QPainterPath, QPen, QColor, QPainterPathStroker, QMouseEvent, QBrush
-from PyQt5 import QtCore
+from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtCore import QRectF
 
 
