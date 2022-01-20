@@ -39,7 +39,7 @@ def import_drawing(mw, plot=True):
     """
     # debuggging
     mw.filename = "../tests/circle-layers.dxf"
-    # mw.filename = "../tests/1in-box.dxf"
+    mw.filename = "../tests/1in-box.dxf"
     # mw.filename = "../tests/two-splines.dxf"
 
     # mw.filename, _ = getOpenFileName(mw,

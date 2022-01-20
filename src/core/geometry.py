@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
 # All geometric entities are structured as follows:
-# A Part has Layers which have Shapes
-# A Shape is made of points
+# A Part has Groups which have Shapes
+# A Shape is made of Entities
 
 import core.point as point
 from PyQt5.QtGui import QPainterPath, QPen, QColor
@@ -125,8 +125,14 @@ class Part(dict):
     def move(self):
         pass
 
-    def rotate(self):
-        pass
+    def rotate(self, deg):
+        """
+        Rotate all shapes in this part.
+        """
+        for shape in shapes:
+            pathItem = shape.pathItem
+            # pathItem
+            pathItem.setRotation(deg)
 
 
 class Group():
@@ -209,6 +215,27 @@ class Shape():
     def isDisabled(self):
         return self.disabled
 
+    def inner_offset(self):
+        """
+        Calculate inner offset of shape using Polygon Offsetting by Computing
+        Winding Numbers (Chen, McMains) algorithm.
+        Only works on straight lines??
+        """
+        # calc winding num
+        # w > 0 is interior
+        # w
+        w = self.calc_winding_num()
+
+    def calc_winding_num(self):
+        # https://cs.stackexchange.com/questions/28656/calculate-winding-number
+        P = 1
+        theta = 1
+        w = 0
+        for i in len(vertices)-1:
+            theta = vertices[i] * P - vertices[i+1] * P
+        return w
+
+
     def calc_bounding_box(self):
         """
         Calculated the BoundingBox of the geometry and saves it into self.BB
@@ -216,17 +243,6 @@ class Shape():
         self.BB = self.geos.abs_el(0).BB
         for geo in self.geos.abs_iter():
             self.BB = self.BB.joinBB(geo.BB)
-
-    def get_start_end_points(self, start_point=None, angles=None):
-        self.start_point = [self.geos[0].x, self.geos[0].y]
-        self.end_point = [self.geos[0].x, self.geos[0].y]
-        # if start_point is None:
-        #     return (self.geos.abs_el(0).get_start_end_points(True, angles),
-        #             self.geos.abs_el(-1).get_start_end_points(False, angles))
-        # elif start_point:
-        #     return self.geos.abs_el(0).get_start_end_points(True, angles)
-        # else:
-        #     return self.geos.abs_el(-1).get_start_end_points(False, angles)
 
     def make_path_item(self, canvas_scene):
         """
