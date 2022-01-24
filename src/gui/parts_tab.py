@@ -33,10 +33,10 @@ class PartsTab(QWidget):
         ]  
 
 
-        self.importData(self.data)
-        self.tree.expandAll()
+        # self.importData(self.data)
+        # self.tree.expandAll()
 
-        # self.part_table_init()
+        self.part_table_init()
 
         
 
@@ -45,12 +45,21 @@ class PartsTab(QWidget):
         Populate part table with geometry tree
         """
 
-        
+        # self.ui.entities_tab.itemClicked.connect(self.load_parts)
+        # self.ui.entitiesTreeView.itemClicked.connect(self.load_parts)
+        self.ui.actionImport.triggered.connect(self.load_parts)
+        # if self.geometry.parts:
+        #     for part in self.geometry.parts:
+        #         self.ui.model.appendRow(QStandardItem(part))
 
-        # for part in self.geometry.parts:
-        #     self.ui.entitiesTreeView.
-        # self.ui.tool_list_Widget.setCurrentRow(0)
-        # self.load_active_tool()
+    def load_parts(self):
+        """
+        """
+        self.importData(self.data)
+        self.tree.expandAll()
+        # if self.geometry.parts:
+        #     for part in self.geometry.parts:
+        #         self.ui.model.appendRow(QStandardItem(part))
 
 
 
