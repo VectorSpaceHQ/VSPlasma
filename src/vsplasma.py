@@ -9,6 +9,7 @@ import gui
 import preprocess.dxfimport.importer as importer
 import core.tooltable as tooltable
 import core.globals as globals
+import gui.parts_tab as parts_tab
 import gui.tools_tab as tools_tab
 import gui.operations_tab as operations_tab
 import core.workpiece as workpiece
@@ -69,6 +70,9 @@ class MainWindow(QMainWindow):
 
         # Setup Tab
         self.SetupTab = setup_tab.SetupTab(self, self.operations)
+
+        # Parts Tab
+        self.PartsTab = parts_tab.PartsTab(self.ui, self.geometry)
 
         # Tool table tab
         self.ToolsTab = tools_tab.ToolsTab(self.ui, self.tools)
