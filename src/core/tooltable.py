@@ -79,6 +79,8 @@ class ToolTable(dict):
         """
         Save tool table to cfg file
         """
+        if not os.path.exists(os.path.dirname(self.filename)):
+            os.mkdir(os.path.dirname(self.filename))
         with open(self.filename, "w") as outfile:
             for tool in self.values():
                 outfile.writelines([tool.name, ":\n"])
