@@ -47,19 +47,26 @@ class PartsTab(QWidget):
 
         # self.ui.entities_tab.itemClicked.connect(self.load_parts)
         # self.ui.entitiesTreeView.itemClicked.connect(self.load_parts)
-        self.ui.actionImport.triggered.connect(self.load_parts)
+        # self.ui.actionImport.triggered.connect(self.load_parts)
+        # self.geometry.changed.connect(self.load_parts)
+        #  self.geometry.value_updated.connect(self.load_parts)
         # if self.geometry.parts:
         #     for part in self.geometry.parts:
         #         self.ui.model.appendRow(QStandardItem(part))
 
-    def load_parts(self):
+    def load_parts(self, geometry):
         """
         """
-        self.importData(self.data)
+        # self.importData(self.data)
+        self.geometry = geometry
+        
+        if self.geometry.parts:
+            for part in self.geometry.parts:
+                for group in self.geometry.parts[part].groups:
+                    for index, shape in enumerate(group.contours): #should be shapes?
+                        self.ui.model.appendRow(QStandardItem(str(index)))
+
         self.tree.expandAll()
-        # if self.geometry.parts:
-        #     for part in self.geometry.parts:
-        #         self.ui.model.appendRow(QStandardItem(part))
 
 
 

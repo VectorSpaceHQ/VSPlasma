@@ -106,6 +106,9 @@ class MainWindow(QMainWindow):
         # create ui.graphics objects
         importer.make_geometry_from_dxf(self)
 
+        # signal an update to the parts_tab
+        self.PartsTab.load_parts(self.geometry)
+
         # plot graphics objects
         self.canvas_scene.draw_all(self)
 
