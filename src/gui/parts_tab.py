@@ -61,10 +61,23 @@ class PartsTab(QWidget):
         self.geometry = geometry
         
         if self.geometry.parts:
-            for part in self.geometry.parts:
-                for group in self.geometry.parts[part].groups:
-                    for index, shape in enumerate(group.contours): #should be shapes?
-                        self.ui.model.appendRow(QStandardItem(str(index)))
+            for part_name, part_object in self.geometry.parts.items():
+                part = QStandardItem(part_name)
+                part.setCheckable(True)
+                for group_index, group_object in enumerate(part_object.groups):
+                    # group = QStandardItem(str(group_index))
+                    group = QStandardItem(group_object.name)
+                    group.setCheckable(True)
+                    # for index, shape in enumerate(group.contours): #should be shapes?
+                    for shape_index, shape_object in enumerate(group_object.contours): #should be shapes?
+                        shape = QStandardItem(str(shape_index))
+                        shape.setCheckable(True)
+                        # self.ui.model.appendRow(QStandardItem(str(index)).setCheckable(True))
+                        group.appendRow(shape)
+                    part.appendRow(group)
+                self.ui.model.appendRow(part)
+        # for row in self.ui.model:
+        #     row.setCheckable(True)
 
         self.tree.expandAll()
 
