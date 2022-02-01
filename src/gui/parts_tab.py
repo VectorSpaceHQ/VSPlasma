@@ -8,10 +8,11 @@ import PyQt5.QtCore
 # from collections import deque
 
 class PartsTab(QWidget):
-    def __init__(self, ui, geometry):
+    def __init__(self, mainwindow, ui, geometry):
         QWidget.__init__(self)
         self.ui = ui
         self.geometry = geometry
+        self.mainwindow = mainwindow
 
         self.tree = self.ui.entitiesTreeView
         
@@ -37,7 +38,8 @@ class PartsTab(QWidget):
         # self.importData(self.data)
         # self.tree.expandAll()
 
-        self.part_table_init()
+        self.ui.model.itemChanged.connect(self.on_item_changed)
+        # self.part_table_init()
 
         
 
@@ -46,7 +48,7 @@ class PartsTab(QWidget):
         Populate part table with geometry tree
         """
 
-        self.ui.model.itemChanged.connect(self.alter_render)
+        self.ui.model.itemChanged.connect(self.on_item_changed)
         # self.ui.entities_tab.itemClicked.connect(self.load_parts)
         # self.ui.entitiesTreeView.itemClicked.connect(self.load_parts)
         # self.ui.actionImport.triggered.connect(self.load_parts)
@@ -56,7 +58,14 @@ class PartsTab(QWidget):
         #     for part in self.geometry.parts:
         #         self.ui.model.appendRow(QStandardItem(part))
 
-    def alter_render(self):
+    def on_item_changed(self, item):
+        state = ['UNCHECKED', 'TRISTATE',  'CHECKED'][item.checkState()]
+        print("Item with text '%s', is at state %s\n" % ( item.text(),  state))
+        if state == "UNCHECKED":
+            item.data().setDisable(True)
+        else:
+            item.data().setDisable(False)
+        self.mainwindow.refresh()
         return
 
     def load_parts(self, geometry):
@@ -78,6 +87,8 @@ class PartsTab(QWidget):
                     # for index, shape in enumerate(group.contours): #should be shapes?
                     for shape_index, shape_object in enumerate(group_object.contours): #should be shapes?
                         shape = QStandardItem(str(shape_index))
+                        # shape.setData(shape_object, role=PyQt5.QtCore.Qt.UserRole)
+                        shape.setData(shape_object)
                         shape.setCheckable(True)
                         shape.setCheckState(PyQt5.QtCore.Qt.Checked)
                         # self.ui.model.appendRow(QStandardItem(str(index)).setCheckable(True))
@@ -87,7 +98,7 @@ class PartsTab(QWidget):
         # for row in self.ui.model:
         #     row.setCheckable(True)
 
-        # On a shape object, you can call shape_object.setDisabled(True) and it won't draw
+        # On a shape object, you can call shape_object.setDisable(True) and it won't draw
 
         self.tree.expandAll()
 
