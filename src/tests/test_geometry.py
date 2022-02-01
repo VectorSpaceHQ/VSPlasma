@@ -11,7 +11,7 @@ import vsplasma as vsp
 def test_basic(qtbot):
     app = QApplication(sys.argv)
     window = vsp.MainWindow(app)
-
+    window.hide()
     qtbot.addWidget(window)
 
     qtbot.mouseClick(window.actionImport, QtCore.Qt.LeftButton)
