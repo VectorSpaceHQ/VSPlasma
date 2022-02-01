@@ -105,6 +105,18 @@ class MainWindow(QMainWindow):
         # plot graphics objects
         self.canvas_scene.draw_all(self)
 
+        print("\n\n*********** TESTING GEOMETRY IMPORT")
+        print(self.geometry.parts)
+        print(self.geometry.groups)
+        print(self.geometry.shapes)
+        for part in self.geometry.parts:
+            print(part.name)
+            for group in part.groups:
+                print(group, group.name, group.nr, group.num_shapes)
+                for shape in group.shapes:
+                    print(shape)
+
+
     def refresh(self):
         # plot graphics objects
         self.canvas_view.items().clear()

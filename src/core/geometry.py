@@ -2,7 +2,11 @@
 
 # All geometric entities are structured as follows:
 # A Part has Groups which have Shapes
-# A Shape is made of Entities
+# A Shape is made of Elements
+
+# Parts is a list of Part objects
+# Groups is a list of Group objects
+# Shapes is a list of Shape objects
 
 import core.point as point
 from PyQt5.QtGui import QPainterPath, QPen, QColor
@@ -29,22 +33,20 @@ class Geos(list):
         return self[element].abs_geo if self[element].abs_geo else self[element]
 
 
-class Parts(dict):
+class Parts(list):
     def __init__(self):
         self.name = None
 
     def __str__(self):
         string = '\nThere are {} total Parts:\n'.format(str(len(self)))
-        i = 1
-        for k, v in self.items():
+        for part in self:
             string += "Part\n"
-            string += "nr: "+ str(i) + "\n"
-            string += "name: " + str(k) +"\n"
-            i += 1
+            string += "nr: "+ str(part.num) + "\n"
+            string += "name: " + str(part.name) +"\n"
         return string
 
 
-class Groups(dict):
+class Groups(list):
     """
     {"group_name": group_obj,
      }
@@ -56,14 +58,14 @@ class Groups(dict):
 
     def __str__(self):
         string = '\nThere are {} total Groups:\n'.format(str(len(self)))
-        for l in self.values():
-            string += "name: " + str(l.name) + "\n"
-            string += "number: " + str(l.nr) + "\n"
+        for group in self:
+            string += "name: " + str(group.name) + "\n"
+            string += "number: " + str(group.nr) + "\n"
         return string
 
     def add_group(self, group):
-        if group not in self.values():
-            self[group.name] = group
+        if group.name not in self.names: # group names must be unique
+            self.append(group)
             self.names.append(group.name)
             self.count += 1
 
@@ -78,9 +80,9 @@ class Shapes(list):
             string += str(contour) + "\n"
         return string
 
-    def add_contour(self, contour):
-        if contour not in self:
-            self.append(contour)
+    def add_shape(self, new_shape):
+        if new_shape not in self:
+            self.append(new_shape)
             self.count += 1
 
     def get_selected(self):
@@ -91,9 +93,10 @@ class Shapes(list):
         return selected_shapes
 
 
-class Part(dict):
+class Part():
     def __init__(self, name=None, collector=None):
         self.name = name
+        self.num = 0
         self.layers = None
         self.active = False
         self.base_x = 0
@@ -106,14 +109,15 @@ class Part(dict):
         self.groups = []
 
         try:
-            collector[self.name] = self # add to collection
+            collector.append(self) # add to Parts collection
         except Exception as e:
-            print("A group must belong to a part")
+            print("A part must belong to a parts")
 
-    def add_group(self, group):
-        if group not in self:
-            self[group.name] = group
-            self.groups.append(group)
+    def add_group(self, new_group):
+        for group in self.groups:
+            if new_group.name == group.name:
+                return
+        self.groups.append(new_group)
 
     def copy(self):
         """
@@ -149,20 +153,21 @@ class Group():
         self.nr = nr
         self.name = name
 
-        self.contours = []
-        self.num_contours = 0
+        self.shapes = []
+        self.num_shapes = 0
 
         try:
             self.parent = part
-            collector.add_group(self) # add to collection
-            part.add_group(self) # add to parent
+            collector.add_group(self) # add to collection (Groups)
+            self.parent.add_group(self) # add to parent (Part)
         except Exception as e:
             print("A group must belong to a part")
 
-    def add_contour(self, contour):
-        if contour not in self.contours:
-            self.contours.append(contour)
-            self.num_contours += 1
+    def add_shape(self, new_shape):
+        # print("ADDSHAPE", new_shape)
+        # if new_shape not in self.shapes:
+        self.shapes.append(new_shape)
+        self.num_shapes += 1
 
 
 class Shape():
@@ -186,8 +191,8 @@ class Shape():
 
         try:
             self.parent = group
-            group.add_contour(self) # add to parent
-            collector.add_contour(self) # add to convenience collection
+            group.add_shape(self) # add to parent (Group)
+            collector.add_shape(self) # add to convenience collection (Shapes)
         except Exception as e:
             print("A shape must belong to a group.")
             print(e)

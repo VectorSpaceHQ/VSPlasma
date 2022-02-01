@@ -932,10 +932,13 @@ def make_geometry_from_dxf(mw):
     for idx, l in enumerate(dxfobj.layers):
         Layers[l.Nr] = l.name
 
+    old_layer_name = ''
     for idx, geo in enumerate(dxfobj.entities.geo):
         layer_nr = geo.Layer_Nr
         layer_name = Layers[layer_nr]
-        group = geometry.Group(part=part, name=layer_name, nr=layer_nr, collector=groups)
+        if layer_name != old_layer_name:
+            group = geometry.Group(part=part, name=layer_name, nr=layer_nr, collector=groups)
+            old_layer_name = layer_name
         elem_list = [e for e in geo.geo]
         shape = geometry.Shape(nr=idx, group=group, geos=elem_list,collector=shapes)
 
