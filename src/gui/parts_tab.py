@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from PyQt5.QtWidgets import QWidget, QVBoxLayout
+from PyQt5.QtWidgets import QWidget
 from gui import treeview
 from PyQt5.QtGui import QStandardItem
 import PyQt5.QtCore
@@ -42,6 +42,9 @@ class PartsTab(QWidget):
             for row_index in range(item.rowCount()):
                 self.set_visible_state(item.child(row_index), False)
 
+        # The issue is with the checkboxes of children not updating properly. Might have to due with blocking signals?
+        # Granted, unchecking the part manually does uncheck everything beneath it properly, just not the other way.
+        # Might want to use this in future: https://stackoverflow.com/questions/35611199/creating-a-toggling-check-all-checkbox-for-a-listview
         if is_top:
             if state == "UNCHECKED":
                 if isinstance(item.data(), Shape):
