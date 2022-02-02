@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import QWidget, QVBoxLayout
 from gui import treeview
 from PyQt5.QtGui import QStandardItem
 import PyQt5.QtCore
+from core.geometry import Shape
 
 # from collections import deque
 
@@ -59,13 +60,51 @@ class PartsTab(QWidget):
         #         self.ui.model.appendRow(QStandardItem(part))
 
     def on_item_changed(self, item):
-        state = ['UNCHECKED', 'TRISTATE',  'CHECKED'][item.checkState()]
-        print("Item with text '%s', is at state %s\n" % ( item.text(),  state))
-        if state == "UNCHECKED":
-            item.data().setDisable(True)
-        else:
-            item.data().setDisable(False)
+        # state = ['UNCHECKED', 'TRISTATE',  'CHECKED'][item.checkState()]
+        # print("Item with text '%s', is at state %s\n" % ( item.text(),  state))
+        # combination of item.hasChildren(), item.rowCount(), and item.child(#)
+        self.ui.model.blockSignals(True) # Prevents infinite recursion when changing items
+        self.set_visible_state(item, True)
+        self.ui.model.blockSignals(False)
+        # if isinstance(checkbox_object_data, Part):
+        #     for group_index, group_object in enumerate(checkbox_object_data.groups):
+        #         for shape_index, shape_object in enumerate(group_object.contours): #should be shapes?
+        #             self.set_visible_state(shape_object, state)
+        # elif isinstance(checkbox_object_data, Group):
+        #     for shape_index, shape_object in enumerate(checkbox_object_data.contours): #should be shapes?
+        #             self.set_visible_state(shape_object, state)
+        # elif isinstance(checkbox_object_data, Shape):
+        #     self.set_visible_state(checkbox_object_data, state)
+        # else:
+        #     pass
+        
         self.mainwindow.refresh()
+        return
+
+    def set_visible_state(self, item, is_top):
+        state = ['UNCHECKED', 'TRISTATE',  'CHECKED'][item.checkState()]
+
+        if item.hasChildren():
+            for row_index in range(item.rowCount()):
+                self.set_visible_state(item.child(row_index), False)
+
+        if is_top:
+            if state == "UNCHECKED":
+                if isinstance(item.data(), Shape):
+                    item.data().setDisable(True)
+            elif state == "CHECKED":
+                if isinstance(item.data(), Shape):
+                    item.data().setDisable(False)
+        else:
+            if state == "UNCHECKED":
+                item.setCheckState(PyQt5.QtCore.Qt.Checked)
+                if isinstance(item.data(), Shape):
+                    item.data().setDisable(False)
+            elif state == "CHECKED":
+                item.setCheckState(PyQt5.QtCore.Qt.Unchecked)
+                if isinstance(item.data(), Shape):
+                    item.data().setDisable(True)
+
         return
 
     def load_parts(self, geometry):
@@ -77,11 +116,13 @@ class PartsTab(QWidget):
         if self.geometry.parts:
             for part_name, part_object in self.geometry.parts.items():
                 part = QStandardItem(part_name)
+                part.setData(part_object)
                 part.setCheckable(True)
                 part.setCheckState(PyQt5.QtCore.Qt.Checked)
                 for group_index, group_object in enumerate(part_object.groups):
                     # group = QStandardItem(str(group_index))
                     group = QStandardItem(group_object.name)
+                    group.setData(group_object)
                     group.setCheckable(True)
                     group.setCheckState(PyQt5.QtCore.Qt.Checked)
                     # for index, shape in enumerate(group.contours): #should be shapes?
