@@ -8,11 +8,11 @@ from core.geometry import Shape
 
 
 class PartsTab(QWidget):
-    def __init__(self, mainwindow, ui, geometry):
+    def __init__(self, ui, geometry, refresh):
         QWidget.__init__(self)
+        self.refresh = refresh
         self.ui = ui
         self.geometry = geometry
-        self.mainwindow = mainwindow
 
         self.tree = self.ui.entitiesTreeView
         self.ui.model = treeview.QStandardItemModel()
@@ -20,47 +20,30 @@ class PartsTab(QWidget):
         self.ui.model.itemChanged.connect(self.on_item_changed)
         return
 
-
-    def part_table_init(self):
-        self.ui.model.itemChanged.connect(self.on_item_changed)
-        return
-
-
     def on_item_changed(self, item):
         self.ui.model.blockSignals(True) # Prevents infinite recursion when changing items
-        self.set_visible_state(item, True)
+        self.set_visible_state(item, item.checkState())
         self.ui.model.blockSignals(False)
-        
-        self.mainwindow.refresh()
+        self.refresh()
         return
 
 
-    def set_visible_state(self, item, is_top):
-        state = ['UNCHECKED', 'TRISTATE',  'CHECKED'][item.checkState()]
+    def set_visible_state(self, item, parent_state):
+        if item.checkState() != parent_state:
+            item.setCheckState(parent_state)
 
         if item.hasChildren():
             for row_index in range(item.rowCount()):
-                self.set_visible_state(item.child(row_index), False)
+                self.set_visible_state(item.child(row_index), item.checkState())
 
-        # The issue is with the checkboxes of children not updating properly. Might have to due with blocking signals?
-        # Granted, unchecking the part manually does uncheck everything beneath it properly, just not the other way.
-        # Might want to use this in future: https://stackoverflow.com/questions/35611199/creating-a-toggling-check-all-checkbox-for-a-listview
-        if is_top:
-            if state == "UNCHECKED":
-                if isinstance(item.data(), Shape):
-                    item.data().setDisable(True)
-            elif state == "CHECKED":
-                if isinstance(item.data(), Shape):
-                    item.data().setDisable(False)
-        else:
-            if state == "UNCHECKED":
-                item.setCheckState(PyQt5.QtCore.Qt.Checked)
-                if isinstance(item.data(), Shape):
-                    item.data().setDisable(False)
-            elif state == "CHECKED":
-                item.setCheckState(PyQt5.QtCore.Qt.Unchecked)
-                if isinstance(item.data(), Shape):
-                    item.data().setDisable(True)
+        state = ['UNCHECKED', 'TRISTATE',  'CHECKED'][item.checkState()]
+        if state == "UNCHECKED":
+            if isinstance(item.data(), Shape):
+                item.data().setDisable(True)
+        elif state == "CHECKED":
+            if isinstance(item.data(), Shape):
+                item.data().setDisable(False)
+
         return
 
 

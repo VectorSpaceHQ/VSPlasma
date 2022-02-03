@@ -72,7 +72,7 @@ class MainWindow(QMainWindow):
         self.SetupTab = setup_tab.SetupTab(self, self.operations)
 
         # Parts Tab
-        self.PartsTab = parts_tab.PartsTab(self, self.ui, self.geometry)
+        self.PartsTab = parts_tab.PartsTab(self.ui, self.geometry, self.refresh)
 
         # Tool table tab
         self.ToolsTab = tools_tab.ToolsTab(self.ui, self.tools)
