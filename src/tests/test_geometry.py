@@ -14,8 +14,7 @@ def test_basic(qtbot):
     window.hide()
     qtbot.addWidget(window)
 
-    qtbot.mouseClick(window.actionImport, QtCore.Qt.LeftButton)
-
-    print(window.geometry.parts)
-
-    assert 0
+    # qtbot.mouseClick(window.actionImport, QtCore.Qt.LeftButton)
+    window.open_file()
+    assert 0 == 1
+    # assert len(window.geometry.parts) == 1
