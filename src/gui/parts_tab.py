@@ -53,23 +53,23 @@ class PartsTab(QWidget):
         self.geometry = geometry
         
         if self.geometry.parts:
-            for part_name, part_object in self.geometry.parts.items():
-                part = QStandardItem(part_name)
-                part.setData(part_object)
-                part.setCheckable(True)
-                part.setCheckState(PyQt5.QtCore.Qt.Checked)
-                for group_index, group_object in enumerate(part_object.groups):
-                    group = QStandardItem(group_object.name)
-                    group.setData(group_object)
-                    group.setCheckable(True)
-                    group.setCheckState(PyQt5.QtCore.Qt.Checked)
-                    for shape_index, shape_object in enumerate(group_object.contours): #should be shapes?
-                        shape = QStandardItem(str(shape_index))
-                        shape.setData(shape_object)
-                        shape.setCheckable(True)
-                        shape.setCheckState(PyQt5.QtCore.Qt.Checked)
-                        group.appendRow(shape)
-                    part.appendRow(group)
-                self.ui.model.appendRow(part)
+            for part in self.geometry.parts:
+                part_item = QStandardItem(part.name)
+                part_item.setData(part)
+                part_item.setCheckable(True)
+                part_item.setCheckState(PyQt5.QtCore.Qt.Checked)
+                for group in part.groups:
+                    group_item = QStandardItem(group.name)
+                    group_item.setData(group)
+                    group_item.setCheckable(True)
+                    group_item.setCheckState(PyQt5.QtCore.Qt.Checked)
+                    for shape_index, shape in enumerate(group.shapes):
+                        shape_item = QStandardItem(str(shape_index))
+                        shape_item.setData(shape)
+                        shape_item.setCheckable(True)
+                        shape_item.setCheckState(PyQt5.QtCore.Qt.Checked)
+                        group_item.appendRow(shape_item)
+                    part_item.appendRow(group_item)
+                self.ui.model.appendRow(part_item)
         self.tree.expandAll()
         return
