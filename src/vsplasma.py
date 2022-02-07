@@ -78,10 +78,12 @@ class MainWindow(QMainWindow):
 
     def connect_signals(self):
         # File
-        self.ui.actionOpen.triggered.connect(lambda: file_handler.open(self))
+
+        # self.ui.actionOpen.triggered.connect(lambda: file_handler.open(self))
         # self.ui.actionImport.triggered.connect(lambda: file_handler.import_drawing(self))
+
         self.ui.actionImport.triggered.connect(self.open_file)
-        self.ui.actionSave.triggered.connect(lambda: file_handler.saveProject(self))
+        # self.ui.actionSave.triggered.connect(lambda: file_handler.saveProject(self))
         self.ui.generate_paths_action.pressed.connect(self.generate_operations)
         self.ui.save_gcode_action.pressed.connect(self.save_gcode)
 
