@@ -9,3 +9,9 @@ __pycache__/
 vsplasma_ui.py
 *~
 *.ngc
+
+# Development Environment
+.vscode/
+
+resources_rc.py
+importer.log
