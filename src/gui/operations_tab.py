@@ -46,13 +46,13 @@ class OperationsTab(QWidget):
             return
 
         for part in self.geometry.parts:
-            if part.active:
+            if not part.isDisabled():
                 # show part
                 for group in part.groups:
-                    if group.active:
+                    if not group.isDisabled():
                         # show group
                         for shape in group.shapes:
-                            if shape.active:
+                            if not shape.isDisabled():
                                 # show shape
                                 pass
 

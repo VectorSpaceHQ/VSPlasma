@@ -137,6 +137,12 @@ class Part():
             pathItem = shape.pathItem
             # pathItem
             pathItem.setRotation(deg)
+            
+    def setDisable(self, flag=False):
+        self.disabled = flag
+
+    def isDisabled(self):
+        return self.disabled
 
 
 class Group():
@@ -168,6 +174,12 @@ class Group():
         # if new_shape not in self.shapes:
         self.shapes.append(new_shape)
         self.num_shapes += 1
+
+    def setDisable(self, flag=False):
+        self.disabled = flag
+
+    def isDisabled(self):
+        return self.disabled
 
 
 class Shape():

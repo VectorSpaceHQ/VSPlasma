@@ -38,11 +38,11 @@ class PartsTab(QWidget):
 
         state = ['UNCHECKED', 'TRISTATE',  'CHECKED'][item.checkState()]
         if state == "UNCHECKED":
-            if isinstance(item.data(), Shape):
-                item.data().setDisable(True)
+            # if isinstance(item.data(), Shape):
+            item.data().setDisable(True)
         elif state == "CHECKED":
-            if isinstance(item.data(), Shape):
-                item.data().setDisable(False)
+            # if isinstance(item.data(), Shape):
+            item.data().setDisable(False)
 
         return
 
