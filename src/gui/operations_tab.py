@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 
 from PyQt5.QtWidgets import QWidget
-from PyQt5.QtGui import QPalette, QFont
+from PyQt5.QtGui import QPalette, QFont, QStandardItem
 from PyQt5 import QtCore
 from PyQt5.QtCore import Qt
+from gui import treeview
 
 
 class OperationsTab(QWidget):
@@ -11,7 +12,7 @@ class OperationsTab(QWidget):
     Creates GUI behavior of Operations Tab.
     ui: the GUI
     """
-    def __init__(self, ui, tools, geometry):
+    def __init__(self, ui, tools, geometry, PartsTab, refresh):
         QWidget.__init__(self)
         self.ui = ui
         self.tools = tools
@@ -20,6 +21,10 @@ class OperationsTab(QWidget):
         self.group_item_model = None
         self.groups_list = None
         self.op = None
+        self.PartsTab_model = PartsTab.ui.model
+        self.PartsTab_checkbox_changed = PartsTab.checkbox_changed
+        self.model = treeview.QStandardItemModel()
+        self.refresh = refresh
 
         self.black_palette = QPalette()
         self.grey_palette = QPalette()
@@ -57,7 +62,9 @@ class OperationsTab(QWidget):
                                 pass
 
     def init_signals_and_slots(self):
-        # self.ui.layers_shapes_treeView.setModel(self.layer_item_model)
+        self.ui.layersShapesTreeView.setModel(self.model)
+        # self.PartsTab_model.itemChanged.connect(self.update_layer_tree)
+        self.PartsTab_checkbox_changed.connect(self.update_layer_tree)
 
         # self.ui.layers_shapes_treeView.selectionModel().selectionChanged.connect(self.update_shape_selection)
         self.ui.save_operation_pushButton.clicked.connect(self.save_operation)
@@ -196,11 +203,82 @@ class OperationsTab(QWidget):
             print("cannot remove operation:", active_operation)
             print(e)
 
-    def build_layer_tree(self, TreeHandler, layerContents):
+    def update_layer_tree(self):
+        """
+        Update Parts, groups and shapes in a layertree when it is altered in the PartsTab
+        """
+        # for part_item in self.model.rowCount()
+        for part_row in range(self.model.rowCount()):
+            part_item = self.model.item(part_row)
+            for group_row in range(part_item.rowCount()):
+                group_item = self.model.item(part_row).child(group_row)
+                for shape_row in range(group_item.rowCount()):
+                    shape_item = group_item.child(shape_row)
+                    if shape_item.data().isDisabled():
+                        shape_item.setCheckable(False)
+                        shape_item.setCheckState(Qt.Unchecked)
+                    else:
+                        shape_item.setCheckable(True)
+                if group_item.data().isDisabled():
+                        group_item.setCheckable(False)
+                        group_item.setCheckState(Qt.Unchecked)
+                else:
+                    group_item.setCheckable(True)
+            if part_item.data().isDisabled():
+                        part_item.setCheckable(False)
+                        part_item.setCheckState(Qt.Unchecked)
+            else:
+                part_item.setCheckable(True)
+        return
+
+    def set_visible_state(self, item, parent_state):
+        if item.checkState() != parent_state:
+            item.setCheckState(parent_state)
+
+        if item.hasChildren():
+            for row_index in range(item.rowCount()):
+                self.set_visible_state(item.child(row_index), item.checkState())
+
+        state = ['UNCHECKED', 'TRISTATE',  'CHECKED'][item.checkState()]
+        if state == "UNCHECKED":
+            # if isinstance(item.data(), Shape):
+            item.data().setDisable(True)
+        elif state == "CHECKED":
+            # if isinstance(item.data(), Shape):
+            item.data().setDisable(False)
+
+        return
+
+    def build_layer_tree(self, geometry):
         """
         Display Parts, groups and shapes in a layertree
         """
-        pass
-        # self.tree_handler = TreeHandler
-        # TreeHandler.buildLayerTree(layerContents)
-        # self.tree_handler.setSelectionCallback(self.update_active_operation)
+        self.geometry = geometry
+        
+        if self.geometry.parts is None:
+            return
+
+        for part in self.geometry.parts:
+            if not part.isDisabled():
+                part_item = QStandardItem(part.name)
+                part_item.setData(part)
+                part_item.setCheckable(True)
+                part_item.setCheckState(Qt.Checked)
+                for group in part.groups:
+                    if not group.isDisabled():
+                        group_item = QStandardItem("_".join([part_item.text(), group.name]))
+                        group_item.setData(group)
+                        group_item.setCheckable(True)
+                        group_item.setCheckState(Qt.Checked)
+                        for shape_index, shape in enumerate(group.shapes):
+                            if not shape.isDisabled():
+                                shape_item = QStandardItem("_".join([group_item.text(), str(shape_index)]))
+                                shape_item.setData(shape)
+                                shape_item.setCheckable(True)
+                                shape_item.setCheckState(Qt.Checked)
+                                group_item.appendRow(shape_item)
+                        part_item.appendRow(group_item)
+                self.model.appendRow(part_item)
+
+        self.ui.layersShapesTreeView.expandAll()
+        return

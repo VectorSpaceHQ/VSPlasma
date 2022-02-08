@@ -107,6 +107,7 @@ class Part():
         self.scale = 1
         self.angle = 0
         self.groups = []
+        self.disabled = False
 
         try:
             collector.append(self) # add to Parts collection

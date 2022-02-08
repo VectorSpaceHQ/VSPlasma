@@ -78,7 +78,7 @@ class MainWindow(QMainWindow):
         self.ToolsTab = tools_tab.ToolsTab(self.ui, self.tools)
 
         # Operations tab
-        self.OperationTab = operations_tab.OperationsTab(self.ui, self.tools, self.geometry)
+        self.OperationTab = operations_tab.OperationsTab(self.ui, self.tools, self.geometry, self.PartsTab, self.refresh)
 
     def connect_signals(self):
         # File
@@ -108,6 +108,9 @@ class MainWindow(QMainWindow):
 
         # signal an update to the parts_tab
         self.PartsTab.load_parts(self.geometry)
+
+        # signal an update to the operations_tab
+        self.OperationTab.build_layer_tree(self.geometry)
 
         # plot graphics objects
         self.canvas_scene.draw_all(self)
