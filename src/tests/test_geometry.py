@@ -1,80 +1,96 @@
 #!/usr/bin/env python3
-# Unit tests against the geometry.py classes
+# -*- coding: utf-8 -*-
+import unittest
 import time
 import sys
-import pytest
-
+from os import path
+sys.path.append( path.dirname( path.dirname( path.abspath(__file__) ) ) )
+from PyQt5.QtWidgets import QApplication
+from PyQt5.QtTest import QTest
+from PyQt5.QtCore import Qt
 import vsplasma as vsp
+import PyQt5
 from PyQt5 import QtCore, QtWidgets
-from PyQt5.QtWidgets import QMainWindow, QLabel, QGridLayout, QWidget, QApplication
+from PyQt5.QtWidgets import QMainWindow, QLabel, QGridLayout, QWidget
 from PyQt5.QtCore import QSize
 
-class HelloWindow(QMainWindow):
-    configuration_changed = QtCore.pyqtSignal()
+app = QApplication(sys.argv)
+window = vsp.MainWindow(app)
 
-    def __init__(self, app):
-        QMainWindow.__init__(self)
-        self.app = app
+class Test1inBox(unittest.TestCase):
+    def setUp(self):
+        window.open_file(filename="../tests/1in-box.dxf")
 
-        self.setMinimumSize(QSize(640, 480))
-        self.setWindowTitle("Hello world - pythonprogramminglanguage.com")
+    def test_geometry_count(self):
+        self.assertEqual(len(window.geometry.parts), 1)
+        self.assertEqual(len(window.geometry.groups), 1)
+        self.assertEqual(len(window.geometry.shapes), 8)
 
-        centralWidget = QWidget(self)
-        self.setCentralWidget(centralWidget)
-
-        gridLayout = QGridLayout(self)
-        centralWidget.setLayout(gridLayout)
-
-        title = QLabel("Hello World from PyQt", self)
-        title.setAlignment(QtCore.Qt.AlignCenter)
-        gridLayout.addWidget(title, 0, 0)
-
-        self.title = title
+    def test_geometry_count2(self):
+        self.assertEqual(len(window.geometry.parts), 1)
+        self.assertEqual(len(window.geometry.groups), 1)
+        self.assertEqual(len(window.geometry.shapes), 8)
 
 
-def test_1in_box(qtbot, monkeypatch):
-    exit_calls = []
+class TestSquare(unittest.TestCase):
+    def setUp(self):
+        window.open_file(filename="../tests/100mm_square.dxf")
 
-    app = QApplication(sys.argv)
-    # app = monkeypatch.setattr(QApplication, "exit", lambda: exit_calls.append(1))
-
-    window = vsp.MainWindow(app)
-    # qtbot.waitForWindowShown(window)
-    # qtbot.addWidget(window)
-
+    def test_geometry_count(self):
+        self.assertEqual(len(window.geometry.parts), 1)
+        self.assertEqual(len(window.geometry.groups), 1)
+        self.assertEqual(len(window.geometry.shapes), 1)
 
 
-    # time.sleep(3)
-    # window.open_file()
+class TestCircleLayers(unittest.TestCase):
+    def setUp(self):
+        window.open_file(filename="../tests/circle-layers.dxf")
 
-    # assert len(window.geometry.parts) == 1
-    assert 1==1
-
-def test_hello(qtbot):
-    widget = HelloWindow(sys.argv)
-    qtbot.addWidget(widget)
-
-    assert widget.title.text() == "Hello World from PyQt"
+    def test_geometry_count(self):
+        self.assertEqual(len(window.geometry.parts), 1)
+        self.assertEqual(len(window.geometry.groups), 2)
+        self.assertEqual(len(window.geometry.shapes), 4)
 
 
-if __name__ == "__main__":
-    # app = QtWidgets.QApplication(sys.argv)
-    # mainWin = HelloWindow(app)
-    # mainWin.show()
-    # sys.exit( app.exec_() )
+# class TestText(unittest.TestCase):
+#     def setUp(self):
+#         window.open_file(filename="../tests/text.dxf")
 
-    # app = QApplication(sys.argv)
-    # window = vsp.MainWindow(app)
-    # window.setWindowTitle('VSPlasma')
-    # window.show()
-    # sys.exit(app.exec_())
-    print("main")
-    app = QApplication(sys.argv)
+#     def test_geometry_count(self):
+#         self.assertEqual(len(window.geometry.parts), 1)
+#         self.assertEqual(len(window.geometry.groups), 2)
+#         self.assertEqual(len(window.geometry.shapes), 4)
 
-    window = vsp.MainWindow(app)
-    window.setWindowTitle('VSPlasma')
-    window.setWindowIcon(QIcon('./images/vsp_icon.png'))
-    print("main")
 
-    window.show()
-    sys.exit(app.exec_())
+class TestTwoArcs(unittest.TestCase):
+    def setUp(self):
+        window.open_file(filename="../tests/two-arcs.dxf")
+
+    def test_geometry_count(self):
+        self.assertEqual(len(window.geometry.parts), 1)
+        self.assertEqual(len(window.geometry.groups), 1)
+        self.assertEqual(len(window.geometry.shapes), 2)
+
+
+class TestTwoEllipses(unittest.TestCase):
+    def setUp(self):
+        window.open_file(filename="../tests/two-ellipses.dxf")
+
+    def test_geometry_count(self):
+        self.assertEqual(len(window.geometry.parts), 1)
+        self.assertEqual(len(window.geometry.groups), 1)
+        self.assertEqual(len(window.geometry.shapes), 2)
+
+
+# class TestTwoSplines(unittest.TestCase):
+#     def setUp(self):
+#         window.open_file(filename="../tests/two-splines.dxf")
+
+#     def test_geometry_count(self):
+#         self.assertEqual(len(window.geometry.parts), 1)
+#         self.assertEqual(len(window.geometry.groups), 1)
+#         self.assertEqual(len(window.geometry.shapes), 2)
+
+
+if __name__ == '__main__':
+    unittest.main()

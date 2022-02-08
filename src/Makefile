@@ -10,7 +10,7 @@ doc:
 init:
 	pip3 install -r ../requirements.txt
 test:
-	python3 -m pytest tests
+	python3 ./tests/test_geometry.py
 
 flake8:
 	flake8 --ignore=E501,F401,E128,E402,E731,F821 vsplasma
