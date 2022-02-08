@@ -28,8 +28,8 @@ import yaml
 import core.globals as g
 
 from collections import OrderedDict
-from configobj import ConfigObj, flatten_errors
-from validate import Validator
+# from configobj import ConfigObj, flatten_errors
+# from validate import Validator
 
 from PyQt5 import QtCore
 

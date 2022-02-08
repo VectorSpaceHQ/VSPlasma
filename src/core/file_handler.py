@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import os
@@ -31,25 +32,23 @@ def open(ui):
     ui.app.processEvents()
     ui.unsetCursor()
 
-def import_drawing(mw, plot=True):
+def import_drawing(mw, plot=True, filename=None):
     """
     Loads dxf and other drawings.  Also calls the command to
     make the plot.
     @param plot: if it should plot
     """
-    # debuggging
-    mw.filename = "../tests/circle-layers.dxf"
-    mw.filename = "../tests/1in-box.dxf"
-    # mw.filename = "../tests/two-splines.dxf"
-
-    # mw.filename, _ = getOpenFileName(mw,
-    #                                  "Import Drawing File",
-    #                                  g.open_path,
-    #                                  "Drawing Files (*.dxf)")
-    # if not QtCore.QFile.exists(mw.filename):
-    #     logger.info("Cannot locate file: %s" % mw.filename)
-    #     if not mw.filename:
-    #         return False
+    if not filename:
+        mw.filename, _ = getOpenFileName(mw,
+                                         "Import Drawing File",
+                                         g.open_path,
+                                         "Drawing Files (*.dxf)")
+        if not QtCore.QFile.exists(mw.filename):
+            logger.info("Cannot locate file: %s" % mw.filename)
+            if not mw.filename:
+                return False
+    else:
+        mw.filename = filename
 
     mw.setCursor(QtCore.Qt.WaitCursor)
     mw.setWindowTitle("VSPlasma - [%s]" % mw.filename)

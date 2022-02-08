@@ -3,7 +3,8 @@ from core.utils import to_float
 
 class SetupTab():
     def __init__(self, mw, operations):
-        self.mw = mw
+
+        # self.mw = mw
         self.ui = mw.ui
         self.operations = operations
         self.canvas_scene = mw.canvas_scene
@@ -100,4 +101,4 @@ class SetupTab():
         self.workpiece.width = to_float(self.ui.workpiece_width_lineEdit.text())
         self.workpiece.length = to_float(self.ui.workpiece_length_lineEdit.text())
 
-        self.mw.refresh()
+        # self.mw.refresh()

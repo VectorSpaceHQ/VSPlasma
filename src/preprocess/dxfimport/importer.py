@@ -944,6 +944,3 @@ def make_geometry_from_dxf(mw):
 
     # Add objects to main ui container
     mw.geometry = geometry.Geometry(Parts=parts, Groups=groups, Shapes=shapes)
-    print(parts)
-    print(groups)
-    print(shapes)

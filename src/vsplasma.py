@@ -84,10 +84,14 @@ class MainWindow(QMainWindow):
         # File
         self.ui.actionOpen.triggered.connect(lambda: file_handler.open(self))
         # self.ui.actionImport.triggered.connect(lambda: file_handler.import_drawing(self))
+
         self.ui.actionImport.triggered.connect(self.open_file)
-        self.ui.actionSave.triggered.connect(lambda: file_handler.saveProject(self))
+        # self.ui.actionSave.triggered.connect(lambda: file_handler.saveProject(self))
         self.ui.generate_paths_action.pressed.connect(self.generate_operations)
         self.ui.save_gcode_action.pressed.connect(self.save_gcode)
+
+    def import_dxf(self):
+        file_handler.import_drawing(self)
 
     def save_gcode(self):
         pass
@@ -99,9 +103,10 @@ class MainWindow(QMainWindow):
         # self.operations.add(op)
         # print(self.operations)
 
-    def open_file(self):
+    def open_file(self, filename=None):
+        # filename="../tests/1in-box.dxf"
         # Read drawing file into self.DXF_file
-        file_handler.import_drawing(self)
+        file_handler.import_drawing(self, filename=filename)
 
         # create ui.graphics objects
         importer.make_geometry_from_dxf(self)
@@ -112,16 +117,16 @@ class MainWindow(QMainWindow):
         # plot graphics objects
         self.canvas_scene.draw_all(self)
 
-        print("\n\n*********** TESTING GEOMETRY IMPORT")
-        print(self.geometry.parts)
-        print(self.geometry.groups)
-        print(self.geometry.shapes)
+        logger.info("\n\n*********** TESTING GEOMETRY IMPORT")
+        logger.info(self.geometry.parts)
+        logger.info(self.geometry.groups)
+        logger.info(self.geometry.shapes)
         for part in self.geometry.parts:
-            print(part.name)
+            logger.info(part.name)
             for group in part.groups:
-                print(group, group.name, group.nr, group.num_shapes)
+                logger.info([group, group.name, group.nr, group.num_shapes])
                 for shape in group.shapes:
-                    print(shape)
+                    logger.info(shape)
 
 
     def refresh(self):
