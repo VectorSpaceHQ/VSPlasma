@@ -6,6 +6,7 @@ from PyQt5 import QtCore
 from PyQt5.QtCore import Qt
 from gui import treeview
 from core.operation import Operation, Operations
+from core.geometry import Shape
 
 
 class OperationsTab(QWidget):
@@ -68,6 +69,7 @@ class OperationsTab(QWidget):
         # self.PartsTab_model.itemChanged.connect(self.update_layer_tree)
         # self.PartsTab_checkbox_changed.connect(self.update_layer_tree)
         self.PartsTab_checkbox_changed.connect(self.build_layer_tree)
+        self.model.itemChanged.connect(self.update_shape_selection)
 
         # self.ui.layers_shapes_treeView.selectionModel().selectionChanged.connect(self.update_shape_selection)
         self.ui.save_operation_pushButton.clicked.connect(self.save_operation)
@@ -131,12 +133,18 @@ class OperationsTab(QWidget):
             # for active_shape in active_shapes:
             #     print(active_shape)
 
-    def update_shape_selection(self, parent, selected, deselected):
-        # print("update_shape_selection: ",parent, selected, deselected)
-        # print(self.active_shapes)
-
-        if self.active_shapes and self.active_tool:
-            self.op = Operation(self.active_shapes, self.active_tool)
+    def update_shape_selection(self, item):
+        """
+        Modifies self.active_shapes based on checkbox status
+        """
+        if isinstance(item.data(), Shape):
+            state = ['UNCHECKED', 'TRISTATE',  'CHECKED'][item.checkState()]
+            for active_shape in self.active_shapes:
+                if active_shape.name == item.data().name and state == "UNCHECKED":
+                    self.active_shapes.remove(active_shape)
+                    return
+            if state == "CHECKED":
+                self.active_shapes.append(item.data()) # reached if the shape isn't found and box was checked
 
     def update_active_tool(self):
         print(self.tool.name)
@@ -214,7 +222,7 @@ class OperationsTab(QWidget):
 
     def build_layer_tree(self, geometry):
         """
-        Display parts, groups and shapes in a layertree based on the Parts Tab
+        Displays parts, groups and shapes in a layertree based on the Parts Tab
         """
         self.geometry = geometry
 
@@ -222,6 +230,7 @@ class OperationsTab(QWidget):
             return
 
         self.model.clear()
+        self.active_shapes.clear()
 
         for part in self.geometry.parts:
             if not part.isDisabled():
@@ -242,6 +251,7 @@ class OperationsTab(QWidget):
                                 shape_item.setCheckable(True)
                                 shape_item.setCheckState(Qt.Checked)
                                 group_item.appendRow(shape_item)
+                                self.active_shapes.append(shape)
                         part_item.appendRow(group_item)
                 self.model.appendRow(part_item)
 

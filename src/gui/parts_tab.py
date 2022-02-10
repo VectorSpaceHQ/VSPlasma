@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from PyQt5.QtWidgets import QWidget
+from PyQt5.QtWidgets import QWidget, QTreeView
 from gui import treeview
 from PyQt5.QtGui import QStandardItem
 import PyQt5.QtCore
@@ -71,7 +71,9 @@ class PartsTab(QWidget):
                     group_item.setCheckable(True)
                     group_item.setCheckState(PyQt5.QtCore.Qt.Checked)
                     for shape_index, shape in enumerate(group.shapes):
-                        shape_item = QStandardItem("_".join([group_item.text(), str(shape_index)]))
+                        shape_name = "_".join([group_item.text(), str(shape_index)])
+                        shape.name = shape_name
+                        shape_item = QStandardItem(shape_name)
                         shape_item.setData(shape)
                         shape_item.setCheckable(True)
                         shape_item.setCheckState(PyQt5.QtCore.Qt.Checked)

@@ -199,6 +199,7 @@ class Shape():
         self.geos = Geos(geos)
         self.pathItem = QGraphicsPathItem()
         self.elements = Elements(elements)  # this will eventually replace Geos
+        self.name = ""
 
         # self.make_paint_path()
 
