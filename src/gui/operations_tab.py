@@ -5,6 +5,7 @@ from PyQt5.QtGui import QPalette, QFont, QStandardItem
 from PyQt5 import QtCore
 from PyQt5.QtCore import Qt
 from gui import treeview
+from core.operation import Operation, Operations
 
 
 class OperationsTab(QWidget):
@@ -21,6 +22,7 @@ class OperationsTab(QWidget):
         self.group_item_model = None
         self.groups_list = None
         self.op = None
+        self.ops = Operations()
         self.PartsTab_model = PartsTab.ui.model
         self.PartsTab_checkbox_changed = PartsTab.checkbox_changed
         self.model = treeview.QStandardItemModel()
@@ -151,24 +153,30 @@ class OperationsTab(QWidget):
 
         self.sender().setPalette(self.black_palette)
 
-        self.active_shapes = self.tree_handler.active_shapes
+        self.get_active_shapes()
 
         if self.active_shapes and self.active_tool:
             # print("active shapes:", self.active_shapes)
             # print("active tool:", self.active_tool)
             self.op = Operation(self.active_shapes, self.active_tool)
 
+    def get_active_shapes(self):
+        self.active_shapes = []
+        for s in self.geometry.shapes:
+            if not s.isDisabled():
+                self.active_shapes.append(s)
+
     def save_operation(self):
-        self.active_shapes = self.tree_handler.active_shapes
+        self.get_active_shapes()
 
         if not self.op:
             return
 
-        g.Operations.add(self.op)
+        self.ops.add(self.op)
 
         # update operations list view
         self.ui.operations_listView.clear()
-        for o in g.Operations:
+        for o in self.ops:
             self.ui.operations_listView.addItem(str(o.nr) + ", " + o.name)
 
     def load_operation(self):
@@ -209,7 +217,7 @@ class OperationsTab(QWidget):
         Display Parts, groups and shapes in a layertree
         """
         self.geometry = geometry
-        
+
         if self.geometry.parts is None:
             return
 
