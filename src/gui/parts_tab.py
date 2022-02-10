@@ -8,7 +8,10 @@ from core.geometry import Shape, Geometry
 
 
 class PartsTab(QWidget):
-
+    """
+    Creates GUI behavior of Parts Tab.
+    ui: the GUI
+    """
     checkbox_changed = PyQt5.QtCore.pyqtSignal(Geometry)
 
     def __init__(self, ui, geometry, refresh):
@@ -20,18 +23,21 @@ class PartsTab(QWidget):
         self.ui.model = treeview.QStandardItemModel()
         self.ui.entitiesTreeView.setModel(self.ui.model)
         self.ui.model.itemChanged.connect(self.on_item_changed)
-        return
 
     def on_item_changed(self, item):
+        """
+        Executes whenever something is changed in the Parts Tab (e.g., checkboxes)
+        """
         self.ui.model.blockSignals(True) # Prevents infinite recursion when changing items
         self.set_visible_state(item, item.checkState())
         self.ui.model.blockSignals(False)
         self.checkbox_changed.emit(self.geometry)
-        self.refresh()
-        return
-
+        self.refresh() # makes the canvas redraw
 
     def set_visible_state(self, item, parent_state):
+        """
+        Alters whether a shape is rendered or not in the cavas based on user selection
+        """
         if item.checkState() != parent_state:
             item.setCheckState(parent_state)
 
@@ -47,11 +53,9 @@ class PartsTab(QWidget):
             # if isinstance(item.data(), Shape):
             item.data().setDisable(False)
 
-        return
-
-
     def load_parts(self, geometry):
         """
+        Creates a treeview object based on imported drawing geometry
         """
         self.geometry = geometry
         
@@ -75,4 +79,3 @@ class PartsTab(QWidget):
                     part_item.appendRow(group_item)
                 self.ui.model.appendRow(part_item)
         self.ui.entitiesTreeView.expandAll()
-        return

@@ -214,7 +214,7 @@ class OperationsTab(QWidget):
 
     def build_layer_tree(self, geometry):
         """
-        Display Parts, groups and shapes in a layertree
+        Display parts, groups and shapes in a layertree based on the Parts Tab
         """
         self.geometry = geometry
 
@@ -246,4 +246,3 @@ class OperationsTab(QWidget):
                 self.model.appendRow(part_item)
 
         self.ui.layersShapesTreeView.expandAll()
-        return
