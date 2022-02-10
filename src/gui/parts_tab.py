@@ -4,12 +4,12 @@ from PyQt5.QtWidgets import QWidget
 from gui import treeview
 from PyQt5.QtGui import QStandardItem
 import PyQt5.QtCore
-from core.geometry import Shape
+from core.geometry import Shape, Geometry
 
 
 class PartsTab(QWidget):
 
-    checkbox_changed = PyQt5.QtCore.pyqtSignal()
+    checkbox_changed = PyQt5.QtCore.pyqtSignal(Geometry)
 
     def __init__(self, ui, geometry, refresh):
         QWidget.__init__(self)
@@ -26,7 +26,7 @@ class PartsTab(QWidget):
         self.ui.model.blockSignals(True) # Prevents infinite recursion when changing items
         self.set_visible_state(item, item.checkState())
         self.ui.model.blockSignals(False)
-        self.checkbox_changed.emit()
+        self.checkbox_changed.emit(self.geometry)
         self.refresh()
         return
 

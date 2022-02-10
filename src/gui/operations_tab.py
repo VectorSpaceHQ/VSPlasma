@@ -64,7 +64,8 @@ class OperationsTab(QWidget):
     def init_signals_and_slots(self):
         self.ui.layersShapesTreeView.setModel(self.model)
         # self.PartsTab_model.itemChanged.connect(self.update_layer_tree)
-        self.PartsTab_checkbox_changed.connect(self.update_layer_tree)
+        # self.PartsTab_checkbox_changed.connect(self.update_layer_tree)
+        self.PartsTab_checkbox_changed.connect(self.build_layer_tree)
 
         # self.ui.layers_shapes_treeView.selectionModel().selectionChanged.connect(self.update_shape_selection)
         self.ui.save_operation_pushButton.clicked.connect(self.save_operation)
@@ -203,52 +204,6 @@ class OperationsTab(QWidget):
             print("cannot remove operation:", active_operation)
             print(e)
 
-    def update_layer_tree(self):
-        """
-        Update Parts, groups and shapes in a layertree when it is altered in the PartsTab
-        """
-        # for part_item in self.model.rowCount()
-        for part_row in range(self.model.rowCount()):
-            part_item = self.model.item(part_row)
-            for group_row in range(part_item.rowCount()):
-                group_item = self.model.item(part_row).child(group_row)
-                for shape_row in range(group_item.rowCount()):
-                    shape_item = group_item.child(shape_row)
-                    if shape_item.data().isDisabled():
-                        shape_item.setCheckable(False)
-                        shape_item.setCheckState(Qt.Unchecked)
-                    else:
-                        shape_item.setCheckable(True)
-                if group_item.data().isDisabled():
-                        group_item.setCheckable(False)
-                        group_item.setCheckState(Qt.Unchecked)
-                else:
-                    group_item.setCheckable(True)
-            if part_item.data().isDisabled():
-                        part_item.setCheckable(False)
-                        part_item.setCheckState(Qt.Unchecked)
-            else:
-                part_item.setCheckable(True)
-        return
-
-    def set_visible_state(self, item, parent_state):
-        if item.checkState() != parent_state:
-            item.setCheckState(parent_state)
-
-        if item.hasChildren():
-            for row_index in range(item.rowCount()):
-                self.set_visible_state(item.child(row_index), item.checkState())
-
-        state = ['UNCHECKED', 'TRISTATE',  'CHECKED'][item.checkState()]
-        if state == "UNCHECKED":
-            # if isinstance(item.data(), Shape):
-            item.data().setDisable(True)
-        elif state == "CHECKED":
-            # if isinstance(item.data(), Shape):
-            item.data().setDisable(False)
-
-        return
-
     def build_layer_tree(self, geometry):
         """
         Display Parts, groups and shapes in a layertree
@@ -257,6 +212,8 @@ class OperationsTab(QWidget):
         
         if self.geometry.parts is None:
             return
+
+        self.model.clear()
 
         for part in self.geometry.parts:
             if not part.isDisabled():
