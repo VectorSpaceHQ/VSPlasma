@@ -87,21 +87,22 @@ class MainWindow(QMainWindow):
 
         self.ui.actionImport.triggered.connect(self.open_file)
         # self.ui.actionSave.triggered.connect(lambda: file_handler.saveProject(self))
-        self.ui.generate_paths_action.pressed.connect(self.generate_operations)
+        self.ui.generate_paths_action.pressed.connect(self.generate_gcode)
         self.ui.save_gcode_action.pressed.connect(self.save_gcode)
 
     def import_dxf(self):
         file_handler.import_drawing(self)
 
     def save_gcode(self):
+        """
+        """
         pass
 
-    def generate_operations(self):
-        selected_shapes = self.geometry.shapes.get_selected()
-        active_tool = self.tools.get_active_tool()
-        op = operation.Operation(selected_shapes, active_tool, parent=self.operations)
-        # self.operations.add(op)
-        # print(self.operations)
+    def generate_gcode(self):
+        """
+        Loop over each operation, generate gcode
+        """
+        self.operations.generate_paths()
 
     def open_file(self, filename=None):
         # filename="../tests/1in-box.dxf"

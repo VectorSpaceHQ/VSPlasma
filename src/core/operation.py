@@ -53,7 +53,10 @@ class Operations(list):
         """
         Generate Paths for each operation
         """
-        pass
+        self.gcode = ''
+        for operation in self:
+            gcode = operation.write_gcode()
+            self.gcode += gcode
 
     def draw_origin(self, canvas):
         try:
