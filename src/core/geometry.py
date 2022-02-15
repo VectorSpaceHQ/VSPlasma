@@ -138,7 +138,7 @@ class Part():
             pathItem = shape.pathItem
             # pathItem
             pathItem.setRotation(deg)
-            
+
     def setDisable(self, flag=False):
         self.disabled = flag
 

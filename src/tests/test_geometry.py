@@ -47,6 +47,12 @@ class TestCircleLayers(unittest.TestCase):
         window.open_file(filename="../tests/circle-layers.dxf")
 
     def test_geometry_count(self):
+        parts = window.geometry.parts
+        part = parts[0]
+        self.assertEqual(len(parts), 1, "Wrong number of parts")
+        self.assertEqual(len(part.groups), 2, "Wrong number of groups")
+        self.assertEqual(len(part.groups[0].shapes), 2, "Wrong number of shapes")
+        self.assertEqual(len(part.groups[1].shapes), 2, "Wrong number of shapes")
         self.assertEqual(len(window.geometry.parts), 1)
         self.assertEqual(len(window.geometry.groups), 2)
         self.assertEqual(len(window.geometry.shapes), 4)
