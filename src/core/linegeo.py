@@ -196,12 +196,12 @@ class LineGeo(object):
 
         self.length = self.Ps.distance(self.Pe)
 
-    def Write_GCode(self, PostPro):
-        """
-        Writes the GCODE for a Line.
-        @param PostPro: The PostProcessor instance to be used
-        @return: Returns the string to be written to a file.
-        """
+    def rapid_to_start(self):
         Ps = self.get_start_end_points(True)
+        line = "G0 X{} Y{}\n".format(Ps.x, Ps.y)
+        return line
+
+    def move_to_end(self):
         Pe = self.get_start_end_points(False)
-        return PostPro.lin_pol_xy(Ps, Pe)
+        line = "G1 X{} Y{}\n".format(Pe.x, Pe.y)
+        return line

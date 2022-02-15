@@ -14,7 +14,7 @@ class OperationsTab(QWidget):
     Creates GUI behavior of Operations Tab.
     ui: the GUI
     """
-    def __init__(self, ui, tools, geometry, PartsTab, refresh):
+    def __init__(self, ui, tools, geometry, PartsTab, refresh, operations):
         QWidget.__init__(self)
         self.ui = ui
         self.tools = tools
@@ -23,7 +23,7 @@ class OperationsTab(QWidget):
         self.group_item_model = None
         self.groups_list = None
         self.op = None
-        self.ops = Operations()
+        self.ops = operations
         self.PartsTab_model = PartsTab.ui.model
         self.PartsTab_checkbox_changed = PartsTab.checkbox_changed
         self.model = treeview.QStandardItemModel()

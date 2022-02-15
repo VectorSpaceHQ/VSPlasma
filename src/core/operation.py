@@ -3,7 +3,8 @@ from PyQt5.QtGui import QPainterPath, QPen, QColor, QPainterPathStroker, QMouseE
 from PyQt5.QtCore import QRectF
 from PyQt5.QtWidgets import QGraphicsItem
 from PyQt5 import QtCore, QtWidgets
-
+from core.point import Point
+from core.linegeo import LineGeo
 
 class Operations(list):
     """
@@ -13,6 +14,7 @@ class Operations(list):
         self.rect = QtWidgets.QGraphicsRectItem()
         self.x0 = 0
         self.y0 = 0
+        self.origin = Point(0,0)
         self.count = len(self)
 
     def __str__(self):
@@ -54,6 +56,14 @@ class Operations(list):
         Generate Paths for each operation
         """
         self.gcode = ''
+
+        # Additional gcode
+        self.gcode += "G20 G40 G90\n"
+
+        # Default feed rate
+        self.gcode += "F1 \n"
+
+        # Add each operation
         for operation in self:
             gcode = operation.write_gcode()
             self.gcode += gcode
@@ -124,7 +134,27 @@ class Operation(object):
     def write_gcode(self):
         # each shape is drawn of geos, those geos have direct Gcode translations
         gcode = ''
+
+        # State Part name
+        gcode += "(Part: {}\n)".format(self.shapes)
+
+        # Set tool
+        gcode += "M6 T{} ({})\n".format(self.tool.number, self.tool.name)
+
+        #--------------- This needs work -------
+        origin = LineGeo(Point(0,0), Point(0,0))
+        last_geo = origin # origin start points
+        #------------------------------
+
         for shape in self.shapes:
             for geo in shape.geos:
-                gcode += geo.Write_GCode()
-        print(gcode)
+                if geo.Ps.x == last_geo.Pe.x and geo.Ps.y == last_geo.Pe.y:
+                    # if start of this line matches end of last, G1
+                    gcode += geo.move_to_end()
+                else:
+                    # else Rapid move G0
+                    gcode += geo.rapid_to_start()
+                    gcode += geo.move_to_end()
+
+                last_geo = geo
+        return gcode

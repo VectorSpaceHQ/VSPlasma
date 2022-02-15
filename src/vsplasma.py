@@ -78,7 +78,7 @@ class MainWindow(QMainWindow):
         self.ToolsTab = tools_tab.ToolsTab(self.ui, self.tools)
 
         # Operations tab
-        self.OperationTab = operations_tab.OperationsTab(self.ui, self.tools, self.geometry, self.PartsTab, self.refresh)
+        self.OperationTab = operations_tab.OperationsTab(self.ui, self.tools, self.geometry, self.PartsTab, self.refresh, self.operations)
 
     def connect_signals(self):
         # File
@@ -96,12 +96,13 @@ class MainWindow(QMainWindow):
     def save_gcode(self):
         """
         """
-        pass
+        file_handler.save_gcode(self, self.operations)
 
     def generate_gcode(self):
         """
         Loop over each operation, generate gcode
         """
+        print("generate gcode")
         self.operations.generate_paths()
 
     def open_file(self, filename=None):

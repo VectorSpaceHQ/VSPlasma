@@ -16,7 +16,7 @@ getSaveFileName = QFileDialog.getSaveFileName
 logger = logging.getLogger()
 
 
-def open(ui):
+def open_project(ui):
     """
     Loads .vsp project files
     """
@@ -101,6 +101,16 @@ def load_project(ui, filename):
 
 def save_project(ui, filename):
     pass
+
+def save_gcode(ui, operations):
+    filename, ext = getSaveFileName(ui,
+                               "Gcode Output File",
+                               "./",
+                               "*.nc")
+    with open(filename, "w") as f:
+        for line in operations.gcode:
+            f.writelines(line)
+
 
 def showSaveDialog(ui, title, MyFormats):
     """
