@@ -107,6 +107,7 @@ class Part():
         self.scale = 1
         self.angle = 0
         self.groups = []
+        self.disabled = False
 
         try:
             collector.append(self) # add to Parts collection
@@ -137,6 +138,12 @@ class Part():
             pathItem = shape.pathItem
             # pathItem
             pathItem.setRotation(deg)
+            
+    def setDisable(self, flag=False):
+        self.disabled = flag
+
+    def isDisabled(self):
+        return self.disabled
 
 
 class Group():
@@ -169,6 +176,12 @@ class Group():
         self.shapes.append(new_shape)
         self.num_shapes += 1
 
+    def setDisable(self, flag=False):
+        self.disabled = flag
+
+    def isDisabled(self):
+        return self.disabled
+
 
 class Shape():
     """
@@ -186,6 +199,7 @@ class Shape():
         self.geos = Geos(geos)
         self.pathItem = QGraphicsPathItem()
         self.elements = Elements(elements)  # this will eventually replace Geos
+        self.name = ""
 
         # self.make_paint_path()
 
