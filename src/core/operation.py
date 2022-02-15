@@ -136,7 +136,7 @@ class Operation(object):
         gcode = ''
 
         # State Part name
-        gcode += "(Part: {}\n)".format(self.shapes)
+        gcode += "(Part: {})\n".format(self.shapes)
 
         # Set tool
         gcode += "M6 T{} ({})\n".format(self.tool.number, self.tool.name)
@@ -154,6 +154,8 @@ class Operation(object):
                 else:
                     # else Rapid move G0
                     gcode += geo.rapid_to_start()
+                    # lead in
+                    # pierce
                     gcode += geo.move_to_end()
 
                 last_geo = geo

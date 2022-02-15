@@ -456,16 +456,24 @@ class ArcGeo(object):
                 string = PostPro.lin_pol_arc(
                     "cw", Ps, Pe, s_ang, e_ang, r, O, IJ, self.ext)
         return string
-    def move_to_end():
+
+    def move_to_end(self):
         Ps, s_ang = self.get_start_end_points(True, True)
         Pe, e_ang = self.get_start_end_points(False, True)
 
         O = self.O
         r = self.r
         IJ = O - Ps
+        print("IJ:", IJ)
+        print("ext:", self.ext)
         if self.ext > 0:
-            line = "G2 X{} Y{} I{} J{}\n".format(Pe.x, Pe.y)
+            line = "G3 X{} Y{} I{} J{}\n".format(Pe.x, Pe.y, IJ.x, IJ.y)
         else:
-            line = "G3 X{} Y{} I{} J{}\n".format(Pe.x, Pe.y)
+            line = "G2 X{} Y{} I{} J{}\n".format(Pe.x, Pe.y, IJ.x, IJ.y)
 
+        return line
+
+    def rapid_to_start(self):
+        Ps, s_ang = self.get_start_end_points(True, True)
+        line = "G0 X{} Y{}\n".format(Ps.x, Ps.y)
         return line
