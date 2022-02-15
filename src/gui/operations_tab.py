@@ -20,6 +20,7 @@ class OperationsTab(QWidget):
         self.tools = tools
         self.geometry = geometry
         self.active_shapes = []
+        self.selected_shapes = []
         self.group_item_model = None
         self.groups_list = None
         self.op = None
@@ -66,6 +67,9 @@ class OperationsTab(QWidget):
 
     def init_signals_and_slots(self):
         self.ui.layersShapesTreeView.setModel(self.model)
+        self.ui.layersShapesTreeView.setSelectionMode(treeview.QTreeView.ExtendedSelection)
+        self.ui.layersShapesTreeView.clicked.connect(self.selection_changed)
+        # self.ui.layersShapesTreeView.selectionChanged.connect(self.state_changed_selection)
         # self.PartsTab_model.itemChanged.connect(self.update_layer_tree)
         # self.PartsTab_checkbox_changed.connect(self.update_layer_tree)
         self.PartsTab_checkbox_changed.connect(self.build_layer_tree)
@@ -84,6 +88,10 @@ class OperationsTab(QWidget):
         self.ui.op_pierce_height_lineEdit.editingFinished.connect(self.update_active_operation)
         self.ui.op_cut_height_lineEdit.editingFinished.connect(self.update_active_operation)
         # self.ui.tool_lead_in_value.textChanged.connect(self.update_active_tool)
+
+    def selection_changed(self, index):
+        for index in self.ui.layersShapesTreeView.selectedIndexes():
+            pass
 
     def load_default_operations(self, idx):
         """

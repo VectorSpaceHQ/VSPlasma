@@ -22,6 +22,7 @@ class PartsTab(QWidget):
 
         self.ui.model = treeview.QStandardItemModel()
         self.ui.entitiesTreeView.setModel(self.ui.model)
+        self.ui.entitiesTreeView.setSelectionMode(QTreeView.ExtendedSelection)
         self.ui.model.itemChanged.connect(self.on_item_changed)
 
     def on_item_changed(self, item):
