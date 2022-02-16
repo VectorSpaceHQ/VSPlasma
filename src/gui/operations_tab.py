@@ -90,8 +90,16 @@ class OperationsTab(QWidget):
         # self.ui.tool_lead_in_value.textChanged.connect(self.update_active_tool)
 
     def selection_changed(self, index):
+        """
+        Add cursor-selected item geometry objects from the treeview to a list
+        """
+        self.selected_shapes.clear()
         for index in self.ui.layersShapesTreeView.selectedIndexes():
-            pass
+            item = self.model.itemFromIndex(index)
+            if isinstance(item.data(), Shape):
+                self.selected_shapes.append(item.data())
+        for shape in self.selected_shapes:
+            print(shape.name)
 
     def load_default_operations(self, idx):
         """
