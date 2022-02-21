@@ -41,16 +41,20 @@ debug_on = False
 class Spline2Arcs:
     def __init__(self, degree=0, Knots=[], Weights=[], CPoints=[], tol=0.01, check=1):
         # Max Abweichung f�r die Biarc Kurve
+        # Max deviation for the biarc curve
         self.epsilon = tol
         self.epsilon_high = self.epsilon * 0.1
         self.segments = 50
 
         # NURBS Klasse initialisieren
+        # NURBS class initialization
         self.NURBS = NURBSClass(degree=degree, Knots=Knots,
                                 CPoints=CPoints, Weights=Weights)
 
         # �berpr�fen der NURBS Parameter �berpr�fung der NURBS Kontrollpunkte ob welche doppelt
         # Innerhalb der gegebenen Tolerans sind (=> Ignorieren)
+        # check the NURBS parameters check the NURBS control points if any are duplicates within 
+        # the given tolerances (=> ignore)
         self.NURBS.check_NURBSParameters(tol, check)
 
         if debug_on:
@@ -62,6 +66,7 @@ class Spline2Arcs:
         logger.debug("Next Analyse and Compress")
 
         # Komprimieren der Biarc und der Linien
+        # Compess the biarc and the lines
         self.Curve = self.analyse_and_compress(BiarcCurves)
 
     def analyse_and_compress(self, BiarcCurves):
@@ -91,11 +96,14 @@ class Spline2Arcs:
         tau = self.epsilon
         Pts = []
         # Schleife f�r die Anzahl der Geometrirs
+        # Loop for the number of geometry
         for geo in Curves:
             NewCurve.append(geo)
             # Wenn die L�nge mindestens 3 sind
+            # If the length is at least 3
             if len(NewCurve) >= 3:
                 # Steigende Spirale
+                # Ascending spiral
                 if isinstance(NewCurve[-3], ArcGeo)\
                    and isinstance(NewCurve[-2], ArcGeo)\
                    and isinstance(NewCurve[-1], ArcGeo):
@@ -110,6 +118,7 @@ class Spline2Arcs:
                         diff = self.check_diff_to_pts(Pts, Arc0, Arc1)
 
                         # �berpr�fen ob es in Toleranz liegt
+                        # Check if it is within tolerance
                         try:
                             if max(diff) < self.epsilon:
                                 tau = self.calc_active_tolerance_inc(self.epsilon, triarc, Arc0, Arc1)
@@ -199,10 +208,12 @@ class Spline2Arcs:
         """
 
         # Errechnen von tb
+        # calculating tb
         V0 = (arc[0].O - arc[0].Ps).unit_vector()
         V2 = (arc[2].O - arc[2].Pe).unit_vector()
 
         # Errechnen der Hilfgr�ssen
+        # Calculating the auxiliary quantities
         t0 = (arc[2].r - arc[0].r)
         D = (arc[2].O - arc[0].O)
         X0 = (t0 * t0) - (D * D)
@@ -211,19 +222,24 @@ class Spline2Arcs:
         Y1 = 2 * (V0 * V2 - 1)
 
         # Errechnen von tb
+        # calculating tb
         tb = (pow((arc[1].r - arc[0].r + eps), 2) - ((arc[1].O - arc[0].O) * (arc[1].O - arc[0].O))) / \
             (2 * (arc[1].r - arc[0].r + eps + (arc[1].O - arc[0].O) * V0))
 
         # Errechnen von tc
+        # calculating tc
         tc = (pow(t0, 2) - (D * D)) / (2 * (t0 - D * V0))
 
         # Auswahl von t
+        # selection of t
         t = min([tb, tc])
 
         # Errechnen von u
+        # Calculate u
         u = (X0 + X1 * t) / (Y0 + Y1 * t)
 
         # Errechnen der neuen Arcs
+        # Calculate the new arcs
         Oa = arc[0].O + t * V0
         ra = arc[0].r + t
         Ob = arc[2].O - u * V2
@@ -254,6 +270,7 @@ class Spline2Arcs:
         V2 = (arc[0].O - arc[0].Ps).unit_vector()
 
         # Errechnen der Hilfgr�ssen
+        # Calculation of auxiliary quantities
         t0 = (arc[0].r - arc[2].r)
         D = (arc[0].O - arc[2].O)
         X0 = (t0 * t0) - (D * D)
@@ -262,19 +279,24 @@ class Spline2Arcs:
         Y1 = 2 * (V0 * V2 - 1)
 
         # Errechnen von tb
+        # calculating tb
         tb = (pow((arc[1].r - arc[2].r + eps), 2) - ((arc[1].O - arc[2].O) * (arc[1].O - arc[2].O))) / \
              (2 * (arc[1].r - arc[2].r + eps + (arc[1].O - arc[2].O) * V0))
 
         # Errechnen von tc
+        # calculating tc
         tc = (pow(t0, 2) - (D * D)) / (2 * (t0 - D * V0))
 
         # Auswahl von t
+        # selection of t
         t = min([tb, tc])
 
         # Errechnen von u
+        # calculating u
         u = (X0 + X1 * t) / (Y0 + Y1 * t)
 
         # Errechnen der neuen Arcs
+        # Calculate the new arcs
         Oa = arc[0].O - u * V2
         ra = arc[0].r - u
         Ob = arc[2].O + t * V0
@@ -320,27 +342,32 @@ class Spline2Arcs:
             anz = len(NewCurve)
             if anz >= 2:
                 # Wenn Geo eine Linie ist anh�ngen und �berpr�fen
+                # If Geo is a line, append and validate
                 if isinstance(NewCurve[-2], LineGeo) and isinstance(NewCurve[-1], LineGeo):
                     Pts.append(geo.Pe)
                     JointLine = LineGeo(NewCurve[-2].Ps, NewCurve[-1].Pe)
 
                     # �berpr�fung der Abweichung
+                    # Verification of deviation
                     res = []
                     for Point in Pts:
                         res.append(JointLine.distance_l_p(Point))
                     # print res
 
                     # Wenn die Abweichung OK ist Vorheriges anh�ngen
+                    # If the difference is OK, append the previous one
                     if max(res) < self.epsilon:
                         anz = len(NewCurve)
                         del NewCurve[anz - 2:anz]
                         NewCurve.append(JointLine)
                         points = [geo.Pe]
                     # Wenn nicht nicht anh�ngen und Pts zur�cksetzen
+                    # If not, unmount and reset pts
                     else:
                         Pts = [geo.Pe]
 
                 # Wenn es eines eine andere Geometrie als eine Linie ist
+                # If it is any geometry other than a line
                 else:
                     Pts = []
 
@@ -351,18 +378,22 @@ class Spline2Arcs:
         calc_high_accurancy_BiarcCurve()
         """
         # Berechnen der zu Berechnenden getrennten Abschnitte
+        # Calculate the separate sections to be calculated
         u_sections = self.calc_u_sections(self.NURBS.Knots,
                                           self.NURBS.ignor,
                                           self.NURBS.knt_m_change[:])
 
         # Step mu� ungerade sein, sonst gibts ein Rundungsproblem um 1
+        # Step must be odd, otherwise there is a rounding problem around 1
         self.max_step = float(self.NURBS.Knots[-1] / (float(self.segments)))
 
         # Berechnen des ersten Biarcs f�rs Fitting
+        # Calculate the first biarc for the fitting
         BiarcCurves = []
         PtsVecs = []
 
         # Schleife f�r die einzelnen Abschnitte
+        # Loop for each section
         for u_sect in u_sections:
             if debug_on:
                 logger.debug("Calculation Biarc Section: %s" % u_sect)
@@ -376,27 +407,33 @@ class Spline2Arcs:
         calc_u_sections()
         """
         # Initialisieren
+        # Initialize
         u_sections = []
 
         # Abfrage ob bereits der Anfang ignoriert wird
+        # Query whether the beginning is already ignored
         # u_beg = Knots[0]
         u_end = Knots[0]
         ig_nr = 0
 
         # Schleife bis u_end==Knots[0]
+        # Loop to u_end==Knots[0]
         while u_end < Knots[-1]:
             u_beg = u_end
             # Wenn Ignor == Start dann Start = Ende von Ignor
+            # If Ignore == Start then Start = End of Ignore
             if len(ignor) > ig_nr:
                 if u_beg == ignor[ig_nr][0]:
                     u_beg = ignor[ig_nr][1]
                     ig_nr += 1
 
                     # L�schen der unsteadys bis gr��er als u_beg
+                    # Delete unsteadys up to greater than u_beg
                     while (len(unsteady) > 0)and(unsteady[0] <= u_beg):
                         del(unsteady[0])
 
             # Wenn Ignor noch mehr beiinhaltet dann Ignor Anfang = Ende
+            # If Ignore is more then Ignore Begin = End
             if len(ignor) > ig_nr:
                 u_end = ignor[ig_nr][0]
             else:
@@ -407,6 +444,7 @@ class Spline2Arcs:
                 del(unsteady[0])
 
             # Solange u_beg nicht das Ende ist anh�ngen
+            # As long as u_beg isn't the end append
             if u_beg != u_end:
                 u_sections.append([u_beg, u_end])
         return u_sections
@@ -426,12 +464,14 @@ class Spline2Arcs:
         step = 0
 
         # Berechnen bis alle Biarcs berechnet sind
+        # Calculate until all biarcs are calculated
         while u < u_sect[-1] - min_u:
             step += 1
             # logger.debug(step)
             u += cur_step
 
             # Begrenzung von u auf den Maximalwert
+            # Limit u to the maximum value
             if u > u_sect[-1]:
                 cur_step = u_sect[-1] - (u - cur_step) - min_u
                 u = u_sect[-1] - min_u
@@ -439,6 +479,7 @@ class Spline2Arcs:
             PtVec = self.NURBS.NURBS_evaluate(n=1, u=u)
 
             # Aus den letzten 2 Punkten den n�chsten Biarc berechnen
+            # Calculate the next biarc from the last 2 points
             Biarc = (BiarcClass(PtsVec[-1][0], PtsVec[-1][1], PtVec[0], PtVec[1], nom_tol * 0.5))
 
             if Biarc.shape == "Zero":
@@ -498,17 +539,20 @@ class Spline2Arcs:
 class NURBSClass:
     def __init__(self, degree=0, Knots=[], Weights=None, CPoints=None):
         self.degree = degree      # Spline degree
-        self.Knots = Knots        # Knoten Vektor
-        self.CPoints = CPoints    # Kontrollpunkte des Splines [2D]
-        self.Weights = Weights    # Gewichtung der Einzelnen Punkte
+        self.Knots = Knots        # Knoten Vektor | Knot Vector
+        self.CPoints = CPoints    # Kontrollpunkte des Splines [2D] | Spline Control Points [2D]
+        self.Weights = Weights    # Gewichtung der Einzelnen Punkte | Weighting of the individual points
 
         # Initialisieren von errechneten Gr��en
-        self.HCPts = []           # Homogenepunkte Vektoren [3D]
+        # Initialize calculated quantities
+        self.HCPts = []           # Homogenepunkte Vektoren [3D] | Homogeneous Points Vectors [3D]
 
         # Punkte in Homogene Punkte umwandeln
+        # Convert points to homogeneous points
         self.CPts_2_HCPts()
 
         # Erstellen der BSplineKlasse zur Berechnung der Homogenen Punkte
+        # Creation of the BSplineClass for the calculation of the homogeneous points
         self.BSpline = BSplineClass(degree=self.degree,
                                     Knots=self.Knots,
                                     CPts=self.HCPts)
@@ -530,6 +574,8 @@ class NURBSClass:
         """
         # �berpr�fen des Knotenvektors
         # Suchen von mehrfachen Knotenpunkte (Anzahl �ber degree+1 => Fehler?!)
+        # Check node vector
+        # Find multiple nodes (number over degree+1 => error?!)
         knt_nr = 1
         knt_vec = [[self.Knots[0]]]
         self.knt_m_change = []
@@ -549,6 +595,7 @@ class NURBSClass:
                     raise ValueError("Same Knots Nr. bigger then degree+1")
 
                 # �berpr�fen der Steigungdifferenz vor und nach dem Punkt wenn Mehrfachknoten
+                # Check the slope difference before and after the point if multiple knots
                 elif len(knt_spts) >= self.degree and\
                      knt_vec[0][0] < knt_spts[-1] < knt_vec[-1][-1]:
 
@@ -562,6 +609,8 @@ class NURBSClass:
 
             # �berpr�fen der Kontrollpunkte
             # Suchen von mehrachen Kontrollpunkten (Anzahl �ber degree+2 => nicht errechnen
+            # Checking the checkpoints
+            # Find multiple control points (number above degree+2 => do not calculate
         if check == 2 or check == 3:
             ctlpt_nr = 0
             ctlpt_vec = [[ctlpt_nr]]
@@ -588,9 +637,11 @@ class NURBSClass:
     def calc_curve(self, n=0, cpts_nr=20):
         """
         calc_curve()
-        Berechnen von eine Anzahl gleichm�ssig verteilter Punkte und bis zur ersten Ableitung
+        Berechnen von eine Anzahl gleichm�ssig verteilter Punkte und bis zur ersten Ableitung.
+        Calculate from a number of evenly spaced points and to the first derivative.
         """
         # Anfangswerte f�r Step und u
+        # Initial values for step and u
         u = 0; Points = []; tang = []
 
         step = self.Knots[-1] / (cpts_nr - 1)
@@ -600,6 +651,7 @@ class NURBSClass:
             Points.append(Pt)
 
             # F�r die erste Ableitung wird den Winkel der tangente errechnet
+            # For the first derivative, the angle of the tangent is calculated
             if n >= 1:
                 tang.append(tangent)
             u += step
@@ -610,23 +662,28 @@ class NURBSClass:
 
     def NURBS_evaluate(self, n=0, u=0):
         """
-        Berechnen eines Punkts des NURBS und der ersten Ableitung
+        Berechnen eines Punkts des NURBS und der ersten Ableitung.
+        Compute a point of the NURBS and the first derivative.
         """
         # Errechnen der korrigierten u's
+        # Calculate the corrected u's
         # cor_u=self.correct_u(u)
         # logger.debug("Bin da")
-
+        
         # Errechnen der Homogenen Punkte bis zur n ten Ableitung
+        # Compute the homogeneous points up to the nth derivative
         HPt = self.BSpline.bspline_ders_evaluate(n=n, u=u)
 
         # logger.debug(HPt)
 
         # Punkt wieder in Normal Koordinaten zur�ck transformieren
+        # Transform point back to normal coordinates
         Point = self.HPt_2_Pt(HPt[0])
 
         # logger.debug(HPt)
 
         # Errechnen der ersten Ableitung wenn n>0 als Richtungsvektor
+        # Calculate the first derivative if n>0 as a direction vector
         dPt = []
         if n > 0:
             #    w(u)*A'(u)-w'(u)*A(u)
@@ -637,6 +694,7 @@ class NURBSClass:
                            pow(HPt[0][-1], 2))
 
             # Berechnen des Winkels des Vektors
+            # Calculate the angle of the vector
             tangent = atan2(dPt[1], dPt[0])
 
             return Point, tangent
@@ -645,7 +703,8 @@ class NURBSClass:
 
     def CPts_2_HCPts(self):
         """
-        Umwandeln der NURBS Kontrollpunkte und Weight in einen Homogenen Vektor
+        Umwandeln der NURBS Kontrollpunkte und Weight in einen Homogenen Vektor.
+        Convert the NURBS Control Points and Weight into a Homogeneous Vector.
         """
         for P_nr in range(len(self.CPoints)):
             HCPtVec = [self.CPoints[P_nr].x * self.Weights[P_nr], \
@@ -655,7 +714,8 @@ class NURBSClass:
 
     def HPt_2_Pt(self, HPt):
         """
-        Umwandeln eines Homogenen PunktVektor in einen Punkt
+        Umwandeln eines Homogenen PunktVektor in einen Punkt.
+        Convert a homogeneous point vector to a point.
         """
         return Point(x=HPt[0] / HPt[-1], y=HPt[1] / HPt[-1])
 
@@ -671,6 +731,7 @@ class BSplineClass:
         self.CPts_len = len(self.CPts)
 
         # Eingangspr�fung, ober KnotenAnzahl usw. passt
+        # Incoming check whether the number of nodes etc. is correct
         if self.Knots_len < self.degree + 1:
             raise ValueError("degree greater than number of control points.")
         if self.Knots_len != (self.CPts_len + self.degree + 1):
@@ -680,25 +741,31 @@ class BSplineClass:
 
     def calc_curve(self, n=0, cpts_nr=20):
         """
-        Berechnen von eine Anzahl gleichm�ssig verteilter Punkte bis zur n-ten Ableitung
+        Berechnen von eine Anzahl gleichm�ssig verteilter Punkte bis zur n-ten Ableitung.
+        Compute a number of evenly spaced points up to the nth derivative.
         """
 
         # Anfangswerte f�r Step und u
+        # Initial values for Step and u
         u = 0
         step = float(self.Knots[-1]) / (cpts_nr - 1)
         Points = []
 
         # Wenn die erste Ableitung oder h�her errechnet wird die ersten
         # Ableitung in dem tan als Winkel in rad gespeichert
+        # If the first derivative or higher is calculated, the first
+        # Derivative where tan is stored as an angle in radians
         tang = []
 
         while u <= self.Knots[-1]:
             CK = self.bspline_ders_evaluate(n=n, u=u)
 
             # Den Punkt in einem Punkt List abspeichern
+            # Store the point in a point list
             Points.append(Point(x=CK[0][0], y=CK[0][1]))
 
             # F�r die erste Ableitung wird den Winkel der tangente errechnet
+            # For the first derivative, the angle of the tangent is calculated
             if n >= 1:
                 tang.append(atan2(CK[1][1], CK[1][0]))
             u += step
@@ -710,9 +777,11 @@ class BSplineClass:
         Modified Version of Algorithm A3.2 from "THE NURBS BOOK" pg.93
         """
         # Berechnung der Position im Knotenvektor
+        # Calculation of the position in the node vector
         span = self.findspan(u)
 
         # Berechnen der Basis Funktion bis zur n ten Ableitung am Punkt u
+        # Calculate the basis function up to the nth derivative at point u
         dN = self.ders_basis_functions(span, u, n)
 
         p = self.degree
@@ -743,12 +812,16 @@ class BSplineClass:
         # logger.debug(self.Knots)
 
         # Spezialfall wenn der Wert==Endpunkt ist
+        # Special case when value==endpoint
         if u == self.Knots[-1]:
             return self.Knots_len - self.degree - 2 # self.Knots_len #-1
 
         # Bin�re Suche starten
         # (Der Interval von low zu high wird immer halbiert bis
         # wert zwischen im Intervall von Knots[mid:mi+1] liegt)
+        # Start binary search
+        # (The interval from low to high is always halved until
+        # value between is in the interval of Knots[mid:mi+1])
         low = self.degree-1
         high = self.Knots_len
         mid = (low + high) // 2
@@ -820,6 +893,7 @@ class BSplineClass:
             ndu[j][j] = saved
 
         # Ergebniss aus S71
+        # Result from S71
         # print("Ndu: %s" %ndu)
 
         # Load the basis functions
@@ -839,6 +913,7 @@ class BSplineClass:
                 # print("j: %s" %j)
 
                 # wenn r-k>0 (Linker Term) und somit
+                # if r-k>0 (left term) and thus
                 if r >= k:
                     a[s2][0] = a[s1][0] / ndu[pk + 1][rk]              # 2te: a[0][0] 1/
                     # print("a[%s][0]=a[%s][0](%s)/ndu[%s][%s](%s)=%s" \
@@ -854,6 +929,7 @@ class BSplineClass:
                     j2 = d - r
 
                 # Hier geht er bei der ersten Ableitung gar nicht rein
+                # It doesn't even go in here for the first derivation
                 # print("j1:%s j2:%s" %(j1,j2))
                 for j in range(j1, j2 + 1):
                     a[s2][j] = (a[s1][j] - a[s1][j - 1]) / ndu[pk + 1][rk + j]
