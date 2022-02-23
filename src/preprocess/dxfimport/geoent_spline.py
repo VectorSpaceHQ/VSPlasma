@@ -54,10 +54,10 @@ class GeoentSpline:
         # Zuweisen der Toleranz f�rs Fitting
         # Assign the fitting tolerance
         tol = g.FITTING_TOLERANCE
-        CHECK = g.SPLINE_CHECK
+        check = g.SPLINE_CHECK
 
         # Umwandeln zu einem ArcSpline
-        # Convert to a ArcSpline
+        # Convert to an ArcSpline
         Spline2ArcsClass = Spline2Arcs(degree=self.degree, Knots=self.Knots,
                                        Weights=self.Weights, CPoints=self.CPoints, tol=tol, check=check)
 
