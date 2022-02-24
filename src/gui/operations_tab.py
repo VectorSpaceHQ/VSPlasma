@@ -193,7 +193,7 @@ class OperationsTab(QWidget):
         """
         active_operation = self.ui.operations_listView.currentItem().text()
         active_operation_idx = int(active_operation.split(",")[0]) - 1
-        self.op = g.Operations[active_operation_idx]
+        self.op = self.ops[active_operation_idx]
 
         self.ui.op_feedrate_lineEdit.setText(str(self.op.tool.feedrate))
         self.ui.op_plunge_rate_lineEdit.setText(str(self.op.tool.plunge_rate))
@@ -212,9 +212,9 @@ class OperationsTab(QWidget):
         active_operation = self.ui.operations_listView.currentItem().text()
         active_operation_idx = int(active_operation.split(",")[0]) - 1
         try:
-            g.Operations.remove(active_operation_idx)
+            self.ops.remove(active_operation_idx)
             self.ui.operations_listView.clear()
-            for o in g.Operations:
+            for o in self.ops:
                 self.ui.operations_listView.addItem(str(o.nr) + ", " + o.name)
         except Exception as e:
             print("cannot remove operation:", active_operation)
