@@ -20,6 +20,7 @@ class OperationsTab(QWidget):
         self.tools = tools
         self.geometry = geometry
         self.active_shapes = []
+        self.selected_shapes = []
         self.group_item_model = None
         self.groups_list = None
         self.op = None
@@ -66,6 +67,9 @@ class OperationsTab(QWidget):
 
     def init_signals_and_slots(self):
         self.ui.layersShapesTreeView.setModel(self.model)
+        self.ui.layersShapesTreeView.setSelectionMode(treeview.QTreeView.ExtendedSelection)
+        self.ui.layersShapesTreeView.clicked.connect(self.selection_changed)
+        # self.ui.layersShapesTreeView.selectionChanged.connect(self.state_changed_selection)
         # self.PartsTab_model.itemChanged.connect(self.update_layer_tree)
         # self.PartsTab_checkbox_changed.connect(self.update_layer_tree)
         self.PartsTab_checkbox_changed.connect(self.build_layer_tree)
@@ -84,6 +88,18 @@ class OperationsTab(QWidget):
         self.ui.op_pierce_height_lineEdit.editingFinished.connect(self.update_active_operation)
         self.ui.op_cut_height_lineEdit.editingFinished.connect(self.update_active_operation)
         # self.ui.tool_lead_in_value.textChanged.connect(self.update_active_tool)
+
+    def selection_changed(self, index):
+        """
+        Add cursor-selected item geometry objects from the treeview to a list
+        """
+        self.selected_shapes.clear()
+        for index in self.ui.layersShapesTreeView.selectedIndexes():
+            item = self.model.itemFromIndex(index)
+            if isinstance(item.data(), Shape):
+                self.selected_shapes.append(item.data())
+        for shape in self.selected_shapes:
+            print(shape.name)
 
     def load_default_operations(self, idx):
         """
@@ -126,8 +142,9 @@ class OperationsTab(QWidget):
         Default values should be grey and become black when modified.
         Changing to a new tool should reset to default values.
         """
-        for shape in self.active_shapes:
-            # print("\nactive shapes: ", active_shapes)
+        print("init operation values")
+        for shape in self.selected_shapes:
+            print("selected shapes: ", self.selected_shapes)
             op = Operation(shape, self.tools['adam'])
             ops.add_operation(op)
             # for active_shape in active_shapes:
@@ -164,9 +181,10 @@ class OperationsTab(QWidget):
         self.get_active_shapes()
 
         if self.active_shapes and self.active_tool:
-            # print("active shapes:", self.active_shapes)
+            print("active shapes:", self.selected_shapes)
             # print("active tool:", self.active_tool)
-            self.op = Operation(self.active_shapes, self.active_tool)
+
+            self.op = Operation(self.selected_shapes, self.active_tool)
 
     def get_active_shapes(self):
         self.active_shapes = []
