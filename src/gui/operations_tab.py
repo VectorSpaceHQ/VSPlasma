@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from PyQt5.QtWidgets import QWidget
-from PyQt5.QtGui import QPalette, QFont, QStandardItem
+from PyQt5.QtGui import QPalette, QFont, QStandardItem, QPen, QColor
 from PyQt5 import QtCore
 from PyQt5.QtCore import Qt, QItemSelectionModel, QItemSelection
 from gui import treeview
@@ -231,12 +231,23 @@ class OperationsTab(QWidget):
         self.ui.operations_listView.currentItem().setFont(QFont('Verdana', 10, QFont.Bold))
 
         # highlight selected shapes in treeview
+        # TODO: The idea of passing around a list of indexes seems poor, I just can't figure out how to find 
+        #       the index bases on the item.data()
         sm = self.ui.layersShapesTreeView.selectionModel()
         sm.clear() # clear current selection
         for index in self.op.indexes:
             sm.select(index, QItemSelectionModel.Select) # selects shape in treeview
 
         # highlight selected shapes in canvas
+        # TODO: This should probably be linked in some better way, like a select/color function
+        for shape in self.geometry.shapes:
+            if shape in self.op.shapes:
+                shape.pathItem.setSelected(True)
+                pen = QPen(QColor('blue'), 0.5)
+            else:
+                shape.pathItem.setSelected(False)
+                pen = QPen(QColor('black'), 0.1)
+            shape.pathItem.setPen(pen)
 
 
     def delete_operation(self):
