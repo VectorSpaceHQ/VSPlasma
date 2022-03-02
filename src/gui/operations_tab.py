@@ -3,7 +3,7 @@
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtGui import QPalette, QFont, QStandardItem
 from PyQt5 import QtCore
-from PyQt5.QtCore import Qt, QItemSelectionModel
+from PyQt5.QtCore import Qt, QItemSelectionModel, QItemSelection
 from gui import treeview
 from core.operation import Operation, Operations
 from core.geometry import Shape
@@ -19,8 +19,9 @@ class OperationsTab(QWidget):
         self.ui = ui
         self.tools = tools
         self.geometry = geometry
-        self.active_shapes = []
-        self.selected_shapes = []
+        self.active_shapes = [] # checkbox related
+        self.selected_shapes = [] # mouse selection related
+        self.selected_shapes_indexes = [] # stores indexes for self.selected_shapes for reselection
         self.group_item_model = None
         self.groups_list = None
         self.op = None
@@ -94,12 +95,12 @@ class OperationsTab(QWidget):
         Add cursor-selected item geometry objects from the treeview to a list
         """
         self.selected_shapes.clear()
+        self.selected_shapes_indexes.clear()
         for index in self.ui.layersShapesTreeView.selectedIndexes():
             item = self.model.itemFromIndex(index)
             if isinstance(item.data(), Shape):
                 self.selected_shapes.append(item.data())
-        for shape in self.selected_shapes:
-            print("selection changed to: ", shape.name)
+                self.selected_shapes_indexes.append(index)
 
     def load_default_operations(self, idx):
         """
@@ -197,7 +198,8 @@ class OperationsTab(QWidget):
 
         if self.selected_shapes and self.active_tool:
             current_shapes = self.selected_shapes.copy() # referencing issues without this
-            op = Operation(current_shapes, self.active_tool)
+            current_indexes = self.selected_shapes_indexes.copy()
+            op = Operation(current_shapes, self.active_tool, current_indexes)
 
         if not op:
             return
@@ -216,7 +218,6 @@ class OperationsTab(QWidget):
         active_operation = self.ui.operations_listView.currentItem().text()
         active_operation_idx = int(active_operation.split(",")[0]) - 1
         self.op = self.ops[active_operation_idx]
-
         self.ui.op_feedrate_lineEdit.setText(str(self.op.tool.feedrate))
         self.ui.op_plunge_rate_lineEdit.setText(str(self.op.tool.plunge_rate))
         self.ui.op_pierce_delay_lineEdit.setText(str(self.op.tool.pierce_delay))
@@ -230,11 +231,10 @@ class OperationsTab(QWidget):
         self.ui.operations_listView.currentItem().setFont(QFont('Verdana', 10, QFont.Bold))
 
         # highlight selected shapes in treeview
-        for shape in self.op.shapes:
-            print("highlight", shape.name)
-            # self.ui.layersShapesTreeView.setCurrentIndex(0, QItemSelectionModel.NoUpdate)
-            # shape.setSelected(True)
-            # self.selected_shapes.append(shape)
+        sm = self.ui.layersShapesTreeView.selectionModel()
+        sm.clear() # clear current selection
+        for index in self.op.indexes:
+            sm.select(index, QItemSelectionModel.Select) # selects shape in treeview
 
         # highlight selected shapes in canvas
 

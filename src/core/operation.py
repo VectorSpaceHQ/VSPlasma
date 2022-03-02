@@ -87,7 +87,7 @@ class Operation(object):
     """
     An operation assigns tool parameters to one or more shapes.
     """
-    def __init__(self, Shapes, Tool, nr=-1, parent=None):
+    def __init__(self, Shapes, Tool, indexes, nr=-1, parent=None):
         self.shapes = Shapes
         self.tool = Tool
         self.name = self.tool.name
@@ -98,6 +98,7 @@ class Operation(object):
         self.disabled = False
         self.locked = False
         self.parent = parent
+        self.indexes = indexes
 
         self.stmove = None
         self.starrow = None
