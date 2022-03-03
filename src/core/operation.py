@@ -61,7 +61,7 @@ class Operations(list):
         self.gcode += "G20 G40 G90\n"
 
         # Default feed rate
-        self.gcode += "F1 \n"
+        self.gcode += "F100 \n"
 
         # Add each operation
         for operation in self:
@@ -107,7 +107,6 @@ class Operation(object):
         if not Tool or not Shapes:
             print("Operation could not be made")
         else:
-            print("Operation made")
             return object.__new__(cls)
 
     def __del__(self):

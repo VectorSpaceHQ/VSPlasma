@@ -3,7 +3,7 @@
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtGui import QPalette, QFont, QStandardItem
 from PyQt5 import QtCore
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QItemSelectionModel
 from gui import treeview
 from core.operation import Operation, Operations
 from core.geometry import Shape
@@ -20,6 +20,7 @@ class OperationsTab(QWidget):
         self.tools = tools
         self.geometry = geometry
         self.active_shapes = []
+        self.selected_shapes = []
         self.group_item_model = None
         self.groups_list = None
         self.op = None
@@ -34,7 +35,7 @@ class OperationsTab(QWidget):
         self.grey_palette.setColor(QPalette.Text, QtCore.Qt.gray)
 
         self.init_signals_and_slots()
-        self.init_operation_values()
+        # self.init_operation_values()
         self.load_tools()
         self.load_geometry()
 
@@ -66,6 +67,9 @@ class OperationsTab(QWidget):
 
     def init_signals_and_slots(self):
         self.ui.layersShapesTreeView.setModel(self.model)
+        self.ui.layersShapesTreeView.setSelectionMode(treeview.QTreeView.ExtendedSelection)
+        self.ui.layersShapesTreeView.clicked.connect(self.selection_changed)
+        # self.ui.layersShapesTreeView.selectionChanged.connect(self.state_changed_selection)
         # self.PartsTab_model.itemChanged.connect(self.update_layer_tree)
         # self.PartsTab_checkbox_changed.connect(self.update_layer_tree)
         self.PartsTab_checkbox_changed.connect(self.build_layer_tree)
@@ -84,6 +88,18 @@ class OperationsTab(QWidget):
         self.ui.op_pierce_height_lineEdit.editingFinished.connect(self.update_active_operation)
         self.ui.op_cut_height_lineEdit.editingFinished.connect(self.update_active_operation)
         # self.ui.tool_lead_in_value.textChanged.connect(self.update_active_tool)
+
+    def selection_changed(self, index):
+        """
+        Add cursor-selected item geometry objects from the treeview to a list
+        """
+        self.selected_shapes.clear()
+        for index in self.ui.layersShapesTreeView.selectedIndexes():
+            item = self.model.itemFromIndex(index)
+            if isinstance(item.data(), Shape):
+                self.selected_shapes.append(item.data())
+        for shape in self.selected_shapes:
+            print("selection changed to: ", shape.name)
 
     def load_default_operations(self, idx):
         """
@@ -114,10 +130,10 @@ class OperationsTab(QWidget):
         self.ui.op_pierce_height_lineEdit.setPalette(self.grey_palette)
         self.ui.op_cut_height_lineEdit.setPalette(self.grey_palette)
 
-        if self.active_shapes and self.active_tool:
-            # print("active shapes:", self.active_shapes)
-            # print("active tool:", self.active_tool)
-            self.op = Operation(self.active_shapes, self.active_tool)
+        # if self.selected_shapes and self.active_tool:
+        #     print("load selected shapes:", self.selected_shapes)
+        #     # print("active tool:", self.active_tool)
+        #     self.op = Operation(self.selected_shapes, self.active_tool)
 
     def init_operation_values(self):
         """
@@ -126,10 +142,11 @@ class OperationsTab(QWidget):
         Default values should be grey and become black when modified.
         Changing to a new tool should reset to default values.
         """
-        for shape in self.active_shapes:
-            # print("\nactive shapes: ", active_shapes)
-            op = Operation(shape, self.tools['adam'])
-            ops.add_operation(op)
+        print("init operation values")
+        for shape in self.selected_shapes:
+            print("selected shapes: ", self.selected_shapes)
+            self.op = Operation(shape, self.tools['adam'])
+            self.ops.add_operation(op)
             # for active_shape in active_shapes:
             #     print(active_shape)
 
@@ -163,10 +180,11 @@ class OperationsTab(QWidget):
 
         self.get_active_shapes()
 
-        if self.active_shapes and self.active_tool:
-            # print("active shapes:", self.active_shapes)
-            # print("active tool:", self.active_tool)
-            self.op = Operation(self.active_shapes, self.active_tool)
+        # if self.selected_shapes and self.active_tool:
+        #     print("active shapes:", self.active_shapes)
+        #     print("selected shapes:", self.selected_shapes)
+        #     # print("active tool:", self.active_tool)
+        #     self.op = Operation(self.selected_shapes, self.active_tool)
 
     def get_active_shapes(self):
         self.active_shapes = []
@@ -177,15 +195,19 @@ class OperationsTab(QWidget):
     def save_operation(self):
         self.get_active_shapes()
 
-        if not self.op:
+        if self.selected_shapes and self.active_tool:
+            current_shapes = self.selected_shapes.copy() # referencing issues without this
+            op = Operation(current_shapes, self.active_tool)
+
+        if not op:
             return
 
-        self.ops.add(self.op)
+        self.ops.add(op)
 
         # update operations list view
         self.ui.operations_listView.clear()
-        for o in self.ops:
-            self.ui.operations_listView.addItem(str(o.nr) + ", " + o.name)
+        for op in self.ops:
+            self.ui.operations_listView.addItem(str(op.nr) + ", " + op.name + ", " + op.shapes[0].name)
 
     def load_operation(self):
         """
@@ -193,7 +215,7 @@ class OperationsTab(QWidget):
         """
         active_operation = self.ui.operations_listView.currentItem().text()
         active_operation_idx = int(active_operation.split(",")[0]) - 1
-        self.op = g.Operations[active_operation_idx]
+        self.op = self.ops[active_operation_idx]
 
         self.ui.op_feedrate_lineEdit.setText(str(self.op.tool.feedrate))
         self.ui.op_plunge_rate_lineEdit.setText(str(self.op.tool.plunge_rate))
@@ -207,14 +229,23 @@ class OperationsTab(QWidget):
             item.setFont(QFont('Sans Serif 10', 10, QFont.Normal))
         self.ui.operations_listView.currentItem().setFont(QFont('Verdana', 10, QFont.Bold))
 
+        # highlight selected shapes in treeview
+        for shape in self.op.shapes:
+            print("highlight", shape.name)
+            # self.ui.layersShapesTreeView.setCurrentIndex(0, QItemSelectionModel.NoUpdate)
+            # shape.setSelected(True)
+            # self.selected_shapes.append(shape)
+
+        # highlight selected shapes in canvas
+
 
     def delete_operation(self):
         active_operation = self.ui.operations_listView.currentItem().text()
         active_operation_idx = int(active_operation.split(",")[0]) - 1
         try:
-            g.Operations.remove(active_operation_idx)
+            self.ops.remove(active_operation_idx)
             self.ui.operations_listView.clear()
-            for o in g.Operations:
+            for o in self.ops:
                 self.ui.operations_listView.addItem(str(o.nr) + ", " + o.name)
         except Exception as e:
             print("cannot remove operation:", active_operation)
